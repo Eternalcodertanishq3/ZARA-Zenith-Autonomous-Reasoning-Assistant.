@@ -60,66 +60,66 @@ The following diagram outlines ZARA's massive **8-Phase Omni-Architecture** and 
 ```mermaid
 graph TD
     %% Input Peripherals
-    subgraph PHASE 1: SENSORY PERCEPTION
-    Mic[🎤 Microphone] --> STT[STT Engine: Faster-Whisper]
-    Cam[📷 Camera/Webcam] --> VIS[Vision Core: Florence-2-base]
-    Cam --> YOLO[YOLO26: Object/Activity Detection]
-    Mic -.-> VEM[Voice Emotion Analyzer]
-    STT --> Fusion[Temporal Multimodal Fusion]
+    subgraph SENSORY_PERCEPTION
+    Mic["🎤 Microphone"] --> STT["STT Engine: Faster-Whisper"]
+    Cam["📷 Camera/Webcam"] --> VIS["Vision Core: Florence-2-base"]
+    Cam --> YOLO["YOLO26: Object/Activity Detection"]
+    Mic -.-> VEM["Voice Emotion Analyzer"]
+    STT --> Fusion["Temporal Multimodal Fusion"]
     VIS --> Fusion
     YOLO --> Fusion
     VEM --> Fusion
     end
 
     %% Internal Processing
-    subgraph PHASE 2 & 3: COGNITION & ARCHIVE
-    Fusion --> GlobalWorkspace[Global Workspace / Self-Model]
-    GlobalWorkspace <--> Meta[Epistemological Meta-Awareness]
-    GlobalWorkspace <--> Sys2[System-2 Deep Reasoner]
+    subgraph COGNITION_AND_ARCHIVE
+    Fusion --> GlobalWorkspace["Global Workspace / Self-Model"]
+    GlobalWorkspace --- Meta["Epistemological Meta-Awareness"]
+    GlobalWorkspace --- Sys2["System-2 Deep Reasoner"]
 
     %% Memories
-    GraphRAG[(GraphRAG Neural Memory)]
-    Chroma[(ChromaDB Vector Store)]
-    ContextComp[Context Compressor]
+    GraphRAG[("GraphRAG Neural Memory")]
+    Chroma[("ChromaDB Vector Store")]
+    ContextComp["Context Compressor"]
 
-    GlobalWorkspace <--> GraphRAG
-    GlobalWorkspace <--> Chroma
+    GlobalWorkspace --- GraphRAG
+    GlobalWorkspace --- Chroma
     GraphRAG --> ContextComp
     Chroma --> ContextComp
     ContextComp --> Brain
     end
 
-    subgraph PHASE 4 & 5: EVOLUTION & SOCIAL
-    Drives[12 Intrinsic Drives] --> AutoGoals[Goal Autogenesis]
-    AutoGoals --> EvoEng[Self-Evolution Engine]
-    EvoEng -.-> |Writes/Tests Code| Framework[Python Execution]
+    subgraph EVOLUTION_AND_SOCIAL
+    Drives["12 Intrinsic Drives"] --> AutoGoals["Goal Autogenesis"]
+    AutoGoals --> EvoEng["Self-Evolution Engine"]
+    EvoEng -.->|"Writes/Tests Code"| Framework["Python Execution"]
 
-    GlobalWorkspace --> SocialInt[Social Intelligence / Subtext]
-    SocialInt --> Neuro[Synthetic Neurochemistry: 8 Transmitters]
-    GlobalWorkspace --> EmpEngine[Anticipatory Empathy]
+    GlobalWorkspace --> SocialInt["Social Intelligence / Subtext"]
+    SocialInt --> Neuro["Synthetic Neurochemistry: 8 Transmitters"]
+    GlobalWorkspace --> EmpEngine["Anticipatory Empathy"]
     end
 
     %% The Core
-    Brain((🧠 Cognitive Core: Qwen3-4B-Q5))
-    GlobalWorkspace ===> Brain
+    Brain(("🧠 Cognitive Core: Qwen3-4B-Q5"))
+    GlobalWorkspace ==> Brain
     AutoGoals -.-> Brain
     Neuro -.-> Brain
     Sys2 -.-> Brain
 
     %% Action & Output
-    subgraph PHASE 6 & 7: AGENCY & EXPRESSION
-    Brain --> Agency[65-Tool Agency Loader]
-    Agency --> Spotify[Spotify / Local IoT]
-    Agency --> Web[Web/GitHub/Obsidian]
+    subgraph AGENCY_AND_EXPRESSION
+    Brain --> Agency["65-Tool Agency Loader"]
+    Agency --> Spotify["Spotify / Local IoT"]
+    Agency --> Web["Web/GitHub/Obsidian"]
 
-    Brain --> TTS[Pipelined Edge TTS]
-    TTS --> Speaker[🔊 Speakers: Zero-Latency Output]
+    Brain --> TTS["Pipelined Edge TTS"]
+    TTS --> Speaker["🔊 Speakers: Zero-Latency Output"]
 
-    Brain --> VRM[3D VRM Avatar Skeleton]
-    Neuro --> EmoSync[Emotion Sync: Face & Pose]
+    Brain --> VRM["3D VRM Avatar Skeleton"]
+    Neuro --> EmoSync["Emotion Sync: Face & Pose"]
     EmoSync --> VRM
 
-    VRM --> Screen[💻 Display UI]
+    VRM --> Screen["💻 Display UI"]
     end
 
     %% Styles

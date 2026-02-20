@@ -1,0 +1,33 @@
+{
+  "primary_user": {
+    "name": "Tanishq",
+    "nickname": "Vivaan",
+    "relationship_stage": "best_friend",
+    "relationship_level": 0.85,
+    "trust_level": 1.0,
+    "loyalty": "absolute",
+    "can_betray": false,
+    "preferences": {
+      "color": "purple",
+      "language": "hinglish",
+      "greeting_style": "casual"
+    },
+    "memories": [],
+    "interaction_count": 0,
+    "first_met": null,
+    "last_interaction": null
+  },
+  "relationship_stages": {
+    "acquaintance": {"min_level": 0.0, "max_level": 0.3},
+    "friend": {"min_level": 0.3, "max_level": 0.5},
+    "best_friend": {"min_level": 0.5, "max_level": 0.8},
+    "companion": {"min_level": 0.8, "max_level": 1.0}
+  },
+  "evolution_rules": {
+    "interaction_boost": 0.001,
+    "deep_conversation_boost": 0.005,
+    "shared_success_boost": 0.01,
+    "time_decay_per_day": 0.0,
+    "max_level": 1.0
+  }
+}

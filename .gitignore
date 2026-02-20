@@ -1,0 +1,85 @@
+# =========================================================================
+# ZARA AI Project - .gitignore
+# Aggressively filters massive models, environments, and caches for GitHub
+# =========================================================================
+
+# 1. Virtual Environments
+venv/
+env/
+.venv/
+.env/
+
+# 2. Local Models & Heavy Weights
+# (Ollama/GGUF models, YOLO, STT/TTS embeddings)
+*.gguf
+*.bin
+*.pt
+*.safetensors
+*.onnx
+
+# 3. AI Caches & Downloaded Assets
+.cache/
+huggingface/
+models/
+.whisper/
+.openwakeword/
+tts_models/
+voice_samples/
+
+# 4. Python Junk & Bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# 5. Memory Databases & Temp Generation
+*.db
+*.sqlite
+*.sqlite3
+zara_sandbox/
+chroma/
+chroma_db/
+vector_db/
+
+# 6. OS & Editor Junk
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+ehthumbs_vista.db
+[Tt]humbs.db
+.vscode/
+.idea/
+
+# 7. Environment Variables & Credentials
+.env
+.env.*
+config.json
+secrets.yaml
+*.pem
+*.key
+.zara_key
+
+# 8. Logs & Output
+logs/
+*.log
+sim_output.txt
+backups/

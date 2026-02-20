@@ -1,0 +1,121 @@
+{
+  "mem_041ad8616396_1770233602": {
+    "id": "mem_041ad8616396_1770233602",
+    "content": "User: I'm really stressed about my Python project deadline",
+    "memory_type": "user_message",
+    "timestamp": 1770233602.836325,
+    "emotional_valence": -0.5,
+    "importance": 0.6,
+    "entity_ids": [
+      "user",
+      "person_user",
+      "person_python",
+      "emotion_stressed",
+      "topic_coding",
+      "topic_work"
+    ],
+    "metadata": {
+      "speaker": "user",
+      "emotion": "stressed"
+    },
+    "access_count": 0,
+    "last_accessed": 1770233602.836325
+  },
+  "mem_14ce67806423_1770233602": {
+    "id": "mem_14ce67806423_1770233602",
+    "content": "ZARA: I understand! Deadlines can be tough. Let me help you break it down.",
+    "memory_type": "zara_response",
+    "timestamp": 1770233602.838842,
+    "emotional_valence": 0.0,
+    "importance": 0.3,
+    "entity_ids": [
+      "user",
+      "zara",
+      "person_deadlines",
+      "person_let",
+      "emotion_sad",
+      "topic_work",
+      "topic_learning"
+    ],
+    "metadata": {
+      "speaker": "zara"
+    },
+    "access_count": 0,
+    "last_accessed": 1770233602.838842
+  },
+  "mem_3091945b9ef0_1770233602": {
+    "id": "mem_3091945b9ef0_1770233602",
+    "content": "User: I love coding but debugging is so frustrating",
+    "memory_type": "user_message",
+    "timestamp": 1770233602.8408434,
+    "emotional_valence": 0.0,
+    "importance": 0.7,
+    "entity_ids": [
+      "user",
+      "person_user",
+      "topic_coding",
+      "topic_relationships"
+    ],
+    "metadata": {
+      "speaker": "user",
+      "emotion": "frustrated"
+    },
+    "access_count": 0,
+    "last_accessed": 1770233602.8408434
+  },
+  "mem_7b9030f2119d_1770233602": {
+    "id": "mem_7b9030f2119d_1770233602",
+    "content": "ZARA: Debugging is like being a detective! Want some tips?",
+    "memory_type": "zara_response",
+    "timestamp": 1770233602.8424344,
+    "emotional_valence": 0.0,
+    "importance": 0.3,
+    "entity_ids": [
+      "person_debugging",
+      "person_want",
+      "topic_coding"
+    ],
+    "metadata": {
+      "speaker": "zara"
+    },
+    "access_count": 0,
+    "last_accessed": 1770233602.8424344
+  },
+  "mem_03a896f4ed9a_1770233602": {
+    "id": "mem_03a896f4ed9a_1770233602",
+    "content": "User: Yesterday I finished the main feature, feeling happy now!",
+    "memory_type": "user_message",
+    "timestamp": 1770233602.8434362,
+    "emotional_valence": 0.8,
+    "importance": 0.5,
+    "entity_ids": [
+      "user",
+      "person_user",
+      "person_yesterday",
+      "emotion_happy",
+      "time_1770233602"
+    ],
+    "metadata": {
+      "speaker": "user",
+      "emotion": "happy"
+    },
+    "access_count": 0,
+    "last_accessed": 1770233602.8434362
+  },
+  "mem_ecc8fae8c199_1770233602": {
+    "id": "mem_ecc8fae8c199_1770233602",
+    "content": "ZARA: That's amazing! You should celebrate this win!",
+    "memory_type": "zara_response",
+    "timestamp": 1770233602.845802,
+    "emotional_valence": 0.0,
+    "importance": 0.3,
+    "entity_ids": [
+      "zara"
+    ],
+    "metadata": {
+      "speaker": "zara"
+    },
+    "access_count": 0,
+    "last_accessed": 1770233602.845802
+  }
+}

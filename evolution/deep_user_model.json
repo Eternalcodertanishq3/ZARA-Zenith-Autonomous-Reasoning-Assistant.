@@ -1,0 +1,45 @@
+{
+  "identity": {
+    "name": null,
+    "probable_age_range": null,
+    "language_preference": [
+      "hinglish",
+      "english"
+    ],
+    "personality_traits": [],
+    "values": []
+  },
+  "emotional_landscape": {
+    "baseline_mood": "content",
+    "stress_triggers": [],
+    "joy_triggers": [],
+    "comfort_topics": [],
+    "sensitive_topics": []
+  },
+  "interaction_patterns": {
+    "preferred_greeting": null,
+    "preferred_response_length": "medium",
+    "communication_style": "casual",
+    "humor_appreciation": 0.6,
+    "active_hours": {
+      "0": 6,
+      "1": 4
+    },
+    "topic_interests": {}
+  },
+  "relationship_depth": {
+    "trust_level": 0.5,
+    "familiarity": 0.4200000000000001,
+    "emotional_bond": 0.4,
+    "shared_memories": [],
+    "inside_jokes": [],
+    "milestones": []
+  },
+  "needs_and_goals": {
+    "current_challenges": [],
+    "aspirations": [],
+    "recurring_needs": [],
+    "support_preferences": []
+  },
+  "evolution_log": []
+}

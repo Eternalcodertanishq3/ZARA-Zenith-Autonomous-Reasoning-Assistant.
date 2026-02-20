@@ -1,0 +1,15 @@
+{
+  "958153f1b8b9": {
+    "name": "general",
+    "description": "Understanding of general based on: Hello ZARA, this is a simulation test.; What is your status?; Hello ZARA",
+    "related_concepts": [],
+    "knowledge_ids": [
+      "53c01c7a8cbb95dd",
+      "ffddb79fe421a111",
+      "b2246867d139e1a6"
+    ],
+    "understanding_level": 0.30000000000000004,
+    "created_at": "2026-02-09T21:50:02.783106",
+    "updated_at": "2026-02-09T21:50:02.783106"
+  }
+}

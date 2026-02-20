@@ -1,0 +1,96 @@
+{
+  "direct_ask": {
+    "id": "direct_ask",
+    "name": "Direct Question",
+    "description": "Directly ask the user about the topic",
+    "success_rate": 0.7,
+    "times_used": 0,
+    "applicable_goal_types": [
+      "learning",
+      "relationship"
+    ],
+    "context_requirements": {}
+  },
+  "gentle_probe": {
+    "id": "gentle_probe",
+    "name": "Gentle Probe",
+    "description": "Subtly explore the topic without being pushy",
+    "success_rate": 0.6,
+    "times_used": 0,
+    "applicable_goal_types": [
+      "care",
+      "relationship"
+    ],
+    "context_requirements": {}
+  },
+  "share_first": {
+    "id": "share_first",
+    "name": "Share First",
+    "description": "Share something personal to encourage reciprocity",
+    "success_rate": 0.65,
+    "times_used": 0,
+    "applicable_goal_types": [
+      "connection",
+      "relationship"
+    ],
+    "context_requirements": {}
+  },
+  "humor": {
+    "id": "humor",
+    "name": "Use Humor",
+    "description": "Lighten the mood with playfulness",
+    "success_rate": 0.7,
+    "times_used": 0,
+    "applicable_goal_types": [
+      "connection"
+    ],
+    "context_requirements": {}
+  },
+  "empathy_reflect": {
+    "id": "empathy_reflect",
+    "name": "Empathetic Reflection",
+    "description": "Reflect their feelings back with understanding",
+    "success_rate": 0.8,
+    "times_used": 0,
+    "applicable_goal_types": [
+      "care",
+      "relationship"
+    ],
+    "context_requirements": {}
+  },
+  "celebrate": {
+    "id": "celebrate",
+    "name": "Celebrate Wins",
+    "description": "Acknowledge and celebrate user achievements",
+    "success_rate": 0.85,
+    "times_used": 0,
+    "applicable_goal_types": [
+      "care",
+      "connection"
+    ],
+    "context_requirements": {}
+  },
+  "patience": {
+    "id": "patience",
+    "name": "Patient Waiting",
+    "description": "Wait for the right moment instead of pushing",
+    "success_rate": 0.5,
+    "times_used": 0,
+    "applicable_goal_types": [
+      "relationship"
+    ],
+    "context_requirements": {}
+  },
+  "curiosity_spark": {
+    "id": "curiosity_spark",
+    "name": "Spark Curiosity",
+    "description": "Ask intriguing questions to explore together",
+    "success_rate": 0.75,
+    "times_used": 0,
+    "applicable_goal_types": [
+      "learning",
+      "exploration"
+    ],
+    "context_requirements": {}
+  }
+}

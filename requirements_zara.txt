@@ -1,0 +1,34 @@
+
+# ZARA v4.0 Sensory System Dependencies
+
+# Build Helpers (Crucial for Windows)
+cmake
+wheel
+setuptools
+
+# Core Intelligence
+torch
+numpy<2.0
+scipy
+psutil
+GPUtil
+
+# Vision (Eyes)
+mediapipe
+face_recognition
+opencv-python
+timm
+
+# Hearing (Ears)
+faster-whisper
+webrtcvad
+openwakeword
+sounddevice
+
+# Voice (Soul)
+TTS
+pyaudio
+
+# Memory & Security
+chromadb
+cryptography

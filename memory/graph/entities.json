@@ -1,0 +1,184 @@
+{
+  "user": {
+    "id": "user",
+    "name": "User",
+    "entity_type": "person",
+    "properties": {
+      "is_owner": true
+    },
+    "created_at": 1770233602.8332253,
+    "last_mentioned": 1770233602.8434362,
+    "mention_count": 5,
+    "importance": 1.0
+  },
+  "zara": {
+    "id": "zara",
+    "name": "ZARA",
+    "entity_type": "person",
+    "properties": {
+      "is_self": true
+    },
+    "created_at": 1770233602.8332253,
+    "last_mentioned": 1770233602.845802,
+    "mention_count": 3,
+    "importance": 1.0
+  },
+  "person_user": {
+    "id": "person_user",
+    "name": "User",
+    "entity_type": "person",
+    "properties": {},
+    "created_at": 1770233602.8353148,
+    "last_mentioned": 1770233602.8434362,
+    "mention_count": 3,
+    "importance": 0.6000000000000001
+  },
+  "person_python": {
+    "id": "person_python",
+    "name": "Python",
+    "entity_type": "person",
+    "properties": {},
+    "created_at": 1770233602.8353148,
+    "last_mentioned": 1770233602.8353148,
+    "mention_count": 1,
+    "importance": 0.5
+  },
+  "emotion_stressed": {
+    "id": "emotion_stressed",
+    "name": "Stressed",
+    "entity_type": "emotion",
+    "properties": {
+      "intensity": 0.7
+    },
+    "created_at": 1770233602.8353148,
+    "last_mentioned": 1770233602.8353148,
+    "mention_count": 1,
+    "importance": 0.5
+  },
+  "topic_coding": {
+    "id": "topic_coding",
+    "name": "Coding",
+    "entity_type": "topic",
+    "properties": {},
+    "created_at": 1770233602.8353148,
+    "last_mentioned": 1770233602.8424344,
+    "mention_count": 3,
+    "importance": 0.6000000000000001
+  },
+  "topic_work": {
+    "id": "topic_work",
+    "name": "Work",
+    "entity_type": "topic",
+    "properties": {},
+    "created_at": 1770233602.8353148,
+    "last_mentioned": 1770233602.838842,
+    "mention_count": 2,
+    "importance": 0.55
+  },
+  "person_deadlines": {
+    "id": "person_deadlines",
+    "name": "Deadlines",
+    "entity_type": "person",
+    "properties": {},
+    "created_at": 1770233602.838842,
+    "last_mentioned": 1770233602.838842,
+    "mention_count": 1,
+    "importance": 0.5
+  },
+  "person_let": {
+    "id": "person_let",
+    "name": "Let",
+    "entity_type": "person",
+    "properties": {},
+    "created_at": 1770233602.838842,
+    "last_mentioned": 1770233602.838842,
+    "mention_count": 1,
+    "importance": 0.5
+  },
+  "emotion_sad": {
+    "id": "emotion_sad",
+    "name": "Sad",
+    "entity_type": "emotion",
+    "properties": {
+      "intensity": 0.7
+    },
+    "created_at": 1770233602.838842,
+    "last_mentioned": 1770233602.838842,
+    "mention_count": 1,
+    "importance": 0.5
+  },
+  "topic_learning": {
+    "id": "topic_learning",
+    "name": "Learning",
+    "entity_type": "topic",
+    "properties": {},
+    "created_at": 1770233602.838842,
+    "last_mentioned": 1770233602.838842,
+    "mention_count": 1,
+    "importance": 0.5
+  },
+  "topic_relationships": {
+    "id": "topic_relationships",
+    "name": "Relationships",
+    "entity_type": "topic",
+    "properties": {},
+    "created_at": 1770233602.8408434,
+    "last_mentioned": 1770233602.8408434,
+    "mention_count": 1,
+    "importance": 0.5
+  },
+  "person_debugging": {
+    "id": "person_debugging",
+    "name": "Debugging",
+    "entity_type": "person",
+    "properties": {},
+    "created_at": 1770233602.8424344,
+    "last_mentioned": 1770233602.8424344,
+    "mention_count": 1,
+    "importance": 0.5
+  },
+  "person_want": {
+    "id": "person_want",
+    "name": "Want",
+    "entity_type": "person",
+    "properties": {},
+    "created_at": 1770233602.8424344,
+    "last_mentioned": 1770233602.8424344,
+    "mention_count": 1,
+    "importance": 0.5
+  },
+  "person_yesterday": {
+    "id": "person_yesterday",
+    "name": "Yesterday",
+    "entity_type": "person",
+    "properties": {},
+    "created_at": 1770233602.8434362,
+    "last_mentioned": 1770233602.8434362,
+    "mention_count": 1,
+    "importance": 0.5
+  },
+  "emotion_happy": {
+    "id": "emotion_happy",
+    "name": "Happy",
+    "entity_type": "emotion",
+    "properties": {
+      "intensity": 0.7
+    },
+    "created_at": 1770233602.8434362,
+    "last_mentioned": 1770233602.8434362,
+    "mention_count": 1,
+    "importance": 0.5
+  },
+  "time_1770233602": {
+    "id": "time_1770233602",
+    "name": "2026-02-05",
+    "entity_type": "time",
+    "properties": {
+      "day_offset": 0
+    },
+    "created_at": 1770233602.8434362,
+    "last_mentioned": 1770233602.8434362,
+    "mention_count": 1,
+    "importance": 0.5
+  }
+}

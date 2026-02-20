@@ -1,0 +1,111 @@
+# ============================================================================
+# ZARA Omni-Architecture v3.0 - Dependencies
+# ============================================================================
+# Install: pip install -r requirements.txt
+# Note: Some packages require specific installation steps (see comments)
+# ============================================================================
+
+# ============================================================================
+# CORE AI/ML
+# ============================================================================
+llama-cpp-python>=0.2.50  # Brain (Qwen-3) - GPU: pip install llama-cpp-python --extra-index-url https://abetlen.github.io/llama-cpp-python/whl/cu121
+torch>=2.0.0              # PyTorch for various models
+transformers>=4.40.0      # HuggingFace transformers
+accelerate>=0.25.0        # Model acceleration
+bitsandbytes>=0.41.0      # Quantization support
+
+# ============================================================================
+# VISION (Phase I)
+# ============================================================================
+opencv-python>=4.8.0      # Camera and image processing
+Pillow>=10.0.0            # Image handling
+mediapipe>=0.10.9         # Face mesh for gaze analysis
+autoawq>=0.2.0            # 4-bit Vision Model Loading
+# timm>=0.9.0             # Vision models (optional, for InternVL)
+
+# ============================================================================
+# AUDIO (Phase I & VI)
+# ============================================================================
+openai-whisper>=20231117  # Speech-to-Text (or faster-whisper below)
+# faster-whisper>=1.0.0   # Alternative faster STT
+sounddevice>=0.4.6        # Audio capture
+soundfile>=0.12.1         # Audio file handling
+scipy>=1.11.0             # Audio processing
+webrtcvad>=2.0.10         # Voice activity detection
+pyaudio>=0.2.14           # Audio I/O (may need: pip install pipwin && pipwin install pyaudio on Windows)
+
+# ============================================================================
+# TEXT-TO-SPEECH (Phase VI)
+# ============================================================================
+TTS>=0.22.0               # Coqui TTS (XTTS v2)
+# RVC requires manual installation from: https://github.com/RVC-Project/Retrieval-based-Voice-Conversion-WebUI
+# For RVC, also need: fairseq, praat-parselmouth, pyworld, faiss-cpu
+
+# ============================================================================
+# MEMORY & VECTOR DB (Phase III)
+# ============================================================================
+chromadb>=0.4.22          # Vector database for memories
+sentence-transformers>=2.2.2  # Embeddings
+
+# ============================================================================
+# SECURITY (Phase V)
+# ============================================================================
+cryptography>=41.0.0      # AES-256 encryption
+face-recognition>=1.3.0   # Face recognition (requires dlib)
+# Note: face_recognition requires:
+#   Windows: Install Visual Studio Build Tools + cmake
+#   Then: pip install cmake dlib face-recognition
+
+# ============================================================================
+# SYSTEM MONITORING (Phase VII)
+# ============================================================================
+psutil>=5.9.0             # System/process monitoring
+GPUtil>=1.4.0             # GPU monitoring (NVIDIA)
+
+# ============================================================================
+# UTILITIES
+# ============================================================================
+numpy>=1.24.0
+colorama>=0.4.6           # Colored terminal output
+tqdm>=4.66.0              # Progress bars
+python-dotenv>=1.0.0      # Environment variables
+requests>=2.31.0          # HTTP requests
+pydantic>=2.0.0           # Data validation
+
+# ============================================================================
+# DEVELOPMENT & TESTING
+# ============================================================================
+pytest>=7.4.0             # Testing framework
+pytest-cov>=4.1.0         # Coverage reporting
+
+# ============================================================================
+# OPTIONAL - Enhanced Features
+# ============================================================================
+# PyPDF2>=3.0.0           # PDF ingestion for knowledge base
+# beautifulsoup4>=4.12.0  # Web scraping for knowledge ingestion
+# feedparser>=6.0.0       # RSS feed parsing
+
+# ============================================================================
+# INSTALLATION NOTES
+# ============================================================================
+# 1. CUDA Support (for GPU acceleration):
+#    pip install torch --index-url https://download.pytorch.org/whl/cu121
+#
+# 2. llama-cpp-python with CUDA:
+#    CMAKE_ARGS="-DLLAMA_CUDA=on" pip install llama-cpp-python --force-reinstall --no-cache-dir
+#
+# 3. face-recognition (Windows):
+#    - Install Visual Studio Build Tools
+#    - pip install cmake
+#    - pip install dlib
+#    - pip install face-recognition
+#
+# 4. PyAudio (Windows):
+#    pip install pipwin
+#    pipwin install pyaudio
+#
+# 5. RVC Voice Conversion:
+#    Clone https://github.com/RVC-Project/Retrieval-based-Voice-Conversion-WebUI
+#    Follow their installation guide for your platform
+#
+# ============================================================================

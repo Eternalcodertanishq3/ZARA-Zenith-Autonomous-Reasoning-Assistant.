@@ -1,0 +1,69 @@
+{
+  "tool_stats": {
+    "read_file": {
+      "use_count": 0,
+      "success_count": 0,
+      "failure_count": 0
+    },
+    "write_file": {
+      "use_count": 0,
+      "success_count": 0,
+      "failure_count": 0
+    },
+    "list_directory": {
+      "use_count": 2,
+      "success_count": 2,
+      "failure_count": 0
+    },
+    "delete_file": {
+      "use_count": 0,
+      "success_count": 0,
+      "failure_count": 0
+    },
+    "run_command": {
+      "use_count": 0,
+      "success_count": 0,
+      "failure_count": 0
+    },
+    "open_application": {
+      "use_count": 0,
+      "success_count": 0,
+      "failure_count": 0
+    },
+    "get_system_info": {
+      "use_count": 2,
+      "success_count": 2,
+      "failure_count": 0
+    },
+    "web_search": {
+      "use_count": 0,
+      "success_count": 0,
+      "failure_count": 0
+    },
+    "fetch_url": {
+      "use_count": 0,
+      "success_count": 0,
+      "failure_count": 0
+    },
+    "speak": {
+      "use_count": 0,
+      "success_count": 0,
+      "failure_count": 0
+    },
+    "send_notification": {
+      "use_count": 0,
+      "success_count": 0,
+      "failure_count": 0
+    },
+    "set_reminder": {
+      "use_count": 0,
+      "success_count": 0,
+      "failure_count": 0
+    },
+    "check_time": {
+      "use_count": 2,
+      "success_count": 2,
+      "failure_count": 0
+    }
+  }
+}

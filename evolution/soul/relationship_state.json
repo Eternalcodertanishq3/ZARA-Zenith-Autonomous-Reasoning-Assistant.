@@ -1,0 +1,20 @@
+{
+  "stage": "acquaintance",
+  "trust": 0.3,
+  "intimacy": 0.2,
+  "shared_experiences": 14,
+  "inside_jokes": [],
+  "pet_names": [],
+  "special_memories": [],
+  "milestones": [
+    {
+      "timestamp": "2026-02-02T01:05:00.780139",
+      "type": "stage_change",
+      "from": "stranger",
+      "to": "acquaintance"
+    }
+  ],
+  "total_interactions": 14,
+  "first_meeting": "2026-02-02T00:50:11.732785",
+  "last_deep_conversation": null
+}

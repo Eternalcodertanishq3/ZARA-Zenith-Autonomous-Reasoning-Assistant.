@@ -1,0 +1,46 @@
+{
+  "gap_req_a63f4e08": {
+    "id": "gap_req_a63f4e08",
+    "description": "User requested: Can you integrate with Spotify to play music?",
+    "detected_at": 1770315924.489252,
+    "context": "Can you integrate with Spotify to play music?",
+    "priority": 0.9,
+    "tags": [
+      "integration",
+      "user_request"
+    ]
+  },
+  "gap_module_8b7c0616": {
+    "id": "gap_module_8b7c0616",
+    "description": "Missing Python module: spotify_api",
+    "detected_at": 1770315924.4902523,
+    "context": "No module named 'spotify_api'",
+    "priority": 0.7,
+    "tags": [
+      "dependency",
+      "module"
+    ]
+  },
+  "gap_module_a5acaa18": {
+    "id": "gap_module_a5acaa18",
+    "description": "Missing Python module: nonexistent_spotify_module",
+    "detected_at": 1770316215.269359,
+    "context": "No module named 'nonexistent_spotify_module'",
+    "priority": 0.7,
+    "tags": [
+      "dependency",
+      "module"
+    ]
+  },
+  "explicit_1770316216": {
+    "id": "explicit_1770316216",
+    "description": "Add weather API integration to provide weather forecasts",
+    "detected_at": 1770316216.2039275,
+    "context": "Explicitly requested evolution",
+    "priority": 0.95,
+    "tags": [
+      "explicit",
+      "user_triggered"
+    ]
+  }
+}

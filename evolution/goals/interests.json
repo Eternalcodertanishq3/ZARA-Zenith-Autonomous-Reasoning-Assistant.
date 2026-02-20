@@ -1,0 +1,62 @@
+{
+  "coding": {
+    "topic": "coding",
+    "intensity": 0.5,
+    "origin": "conversation",
+    "first_seen": 1770146783.9109445,
+    "last_engaged": 1770146783.9109445,
+    "engagement_count": 1,
+    "related_topics": [],
+    "depth": 0.1,
+    "emotional_valence": 0.5,
+    "growth_rate": 0.0
+  },
+  "work": {
+    "topic": "work",
+    "intensity": 0.5,
+    "origin": "conversation",
+    "first_seen": 1770146783.9114492,
+    "last_engaged": 1770146783.9114492,
+    "engagement_count": 1,
+    "related_topics": [],
+    "depth": 0.1,
+    "emotional_valence": 0.5,
+    "growth_rate": 0.0
+  },
+  "health": {
+    "topic": "health",
+    "intensity": 0.5,
+    "origin": "conversation",
+    "first_seen": 1770146783.9124548,
+    "last_engaged": 1770146783.9124548,
+    "engagement_count": 1,
+    "related_topics": [],
+    "depth": 0.1,
+    "emotional_valence": 0.5,
+    "growth_rate": 0.0
+  },
+  "python programming": {
+    "topic": "Python programming",
+    "intensity": 0.5,
+    "origin": "conversation",
+    "first_seen": 1770146783.9204688,
+    "last_engaged": 1770146783.9204688,
+    "engagement_count": 1,
+    "related_topics": [],
+    "depth": 0.1,
+    "emotional_valence": 0.5,
+    "growth_rate": 0.0
+  },
+  "debugging": {
+    "topic": "debugging",
+    "intensity": 0.5,
+    "origin": "conversation",
+    "first_seen": 1770146783.9241302,
+    "last_engaged": 1770146783.9241302,
+    "engagement_count": 1,
+    "related_topics": [],
+    "depth": 0.1,
+    "emotional_valence": 0.5,
+    "growth_rate": 0.0
+  }
+}

@@ -1,0 +1,77 @@
+{
+  "53c01c7a8cbb95dd": {
+    "content": "Hello ZARA, this is a simulation test.",
+    "knowledge_type": "factual",
+    "source": "user_conversation",
+    "confidence": 0.7999999999999999,
+    "relevance": 0.8,
+    "timestamp": "2026-02-02T00:52:48.986212",
+    "topics": [
+      "general"
+    ],
+    "connections": [],
+    "access_count": 13,
+    "last_accessed": "2026-02-17T00:15:44.588864",
+    "metadata": {}
+  },
+  "ffddb79fe421a111": {
+    "content": "What is your status?",
+    "knowledge_type": "factual",
+    "source": "user_conversation",
+    "confidence": 0.7999999999999999,
+    "relevance": 0.8,
+    "timestamp": "2026-02-02T00:53:53.372709",
+    "topics": [
+      "general"
+    ],
+    "connections": [],
+    "access_count": 12,
+    "last_accessed": "2026-02-17T00:15:44.588864",
+    "metadata": {}
+  },
+  "b2246867d139e1a6": {
+    "content": "Hello ZARA",
+    "knowledge_type": "factual",
+    "source": "user_conversation",
+    "confidence": 0.8999999999999999,
+    "relevance": 0.8,
+    "timestamp": "2026-02-09T21:50:02.783106",
+    "topics": [
+      "general"
+    ],
+    "connections": [],
+    "access_count": 7,
+    "last_accessed": "2026-02-17T00:15:44.588864",
+    "metadata": {}
+  },
+  "f7c9ce88298ee1aa": {
+    "content": "Hello",
+    "knowledge_type": "factual",
+    "source": "user_conversation",
+    "confidence": 0.7,
+    "relevance": 0.8,
+    "timestamp": "2026-02-09T21:51:13.882120",
+    "topics": [
+      "general"
+    ],
+    "connections": [],
+    "access_count": 4,
+    "last_accessed": "2026-02-17T00:15:44.588864",
+    "metadata": {}
+  },
+  "4f03ec1bff1dca15": {
+    "content": "i am asking you how are you??",
+    "knowledge_type": "factual",
+    "source": "user_conversation",
+    "confidence": 0.7,
+    "relevance": 0.8,
+    "timestamp": "2026-02-17T00:17:34.540724",
+    "topics": [
+      "general"
+    ],
+    "connections": [],
+    "access_count": 0,
+    "last_accessed": "",
+    "metadata": {}
+  }
+}

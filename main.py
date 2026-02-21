@@ -1007,14 +1007,35 @@ class ZaraConsciousness:
         last_proactive_check = time.time()
         proactive_interval = 30  # Check every 30 seconds
         
-        try:
-            while self.is_running:
-                # Interrupts/proactive checks DISABLED for stability
-                # (background thread interactions cause crashes)
-                
-                # Get input
+        while self.is_running:
+            try:
+                # 🧠 1. CHECK SENSORY QUEUES (The Nervous System)
+                # Check Vision
                 try:
-                    user_input = input("\n👤 YOU: ").strip()
+                    while not self.vision_queue.empty():
+                        v_data = self.vision_queue.get_nowait()
+                        if v_data.get("type") == "vision":
+                            self.latest_vision_context = v_data.get("content", "")
+                            logger.debug(f"Vision update: {self.latest_vision_context[:50]}...")
+                except queue.Empty:
+                    pass
+
+                # Check Audio (If she hears you speak, process it automatically!)
+                try:
+                    while not self.audio_queue.empty():
+                        a_data = self.audio_queue.get_nowait()
+                        if a_data.get("type") == "text":
+                            spoken_text = a_data.get("content", "")
+                            print(f"\n🎤 [HEARD]: {spoken_text}")
+                            self.process_input(spoken_text) # Send spoken words to brain
+                except queue.Empty:
+                    pass
+
+                # ⌨️ 2. CHECK KEYBOARD INPUT
+                # Note: input() is blocking in terminal mode. 
+                # In GUI mode, this will be a non-blocking event loop.
+                try:
+                    user_input = input("\n👤 VIVAAN: ").strip()
                 except EOFError:
                     break
                 
@@ -1022,12 +1043,13 @@ class ZaraConsciousness:
                     continue
                 
                 # Exit commands
-                if user_input.lower() in ["exit", "quit", "bye", "goodbye"]:
+                if user_input.lower() in ["exit", "quit", "bye", "goodbye", "sleep"]:
                     farewell = self.soul.get_farewell() if self.soul else "Goodbye! I'll miss you."
                     if self.voice:
                         self.voice.speak(farewell, mood="sad")
                     else:
                         print(f"✨ ZARA: {farewell}")
+                    self.stop()
                     break
                 
                 # Process and respond
@@ -1048,15 +1070,15 @@ class ZaraConsciousness:
                     else:
                         print(f"✨ ZARA: {response}")
                 except Exception as proc_err:
-                    import traceback
                     logger.error(f"process_input crashed: {proc_err}")
-                    traceback.print_exc()
                     print(f"✨ ZARA: Sorry, I hit an error processing that. Try again!")
                 
-        except KeyboardInterrupt:
-            logger.warning("\n[Interrupted]")
-        finally:
-            self.stop()
+            except KeyboardInterrupt:
+                logger.info("Keyboard interrupt detected.")
+                self.stop()
+                break
+            except Exception as e:
+                logger.error(f"Error in interactive loop: {e}", exc_info=True)
 
     def run_gui(self):
         """Run with GUI (avatar window)."""

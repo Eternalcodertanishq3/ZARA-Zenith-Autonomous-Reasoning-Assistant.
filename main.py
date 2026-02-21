@@ -24,6 +24,10 @@ import signal
 from datetime import datetime
 from typing import Optional
 
+# 🚀 NEW: True Multiprocessing Imports
+from multiprocessing import Process, Queue, Event
+import queue  # For queue.Empty exception handling
+
 # Configure logging before imports
 logging.basicConfig(
     format='%(asctime)s | %(name)-15s | %(levelname)-7s | %(message)s',
@@ -172,6 +176,44 @@ from utils.resource_optimizer import get_optimizer, ResourceOptimizer
 # Dashboard (Native Desktop - No Browser Required)
 from dashboard.native_app import get_native_dashboard
 
+# ═══════════════════════════════════════════════════════════════════
+# 🚀 ISOLATED SENSORY WORKERS (Prevents C-Level Crashes)
+# ═══════════════════════════════════════════════════════════════════
+def isolated_audio_worker(audio_queue: Queue, stop_event: Event):
+    """Runs Whisper completely isolated from the main GPU thread."""
+    try:
+        from ears.stt_engine import HearingSystem
+        ears = HearingSystem()
+        # Initialize successfully
+        audio_queue.put({"status": "ready"})
+        
+        for text in ears.process_audio_stream():
+            if stop_event.is_set():
+                break
+            if text and text.strip():
+                audio_queue.put({"type": "text", "content": text})
+                
+    except Exception as e:
+        audio_queue.put({"status": "error", "error": str(e)})
+
+def isolated_vision_worker(vision_queue: Queue, stop_event: Event):
+    """Runs OpenCV/Florence completely isolated from the main thread."""
+    try:
+        from eyes.vision_core import VisionSystem
+        eyes = VisionSystem()
+        eyes.start()
+        vision_queue.put({"status": "ready"})
+        
+        while not stop_event.is_set():
+            # Send periodic visual updates instead of passing raw heavy frames
+            desc = eyes.get_description() if hasattr(eyes, 'get_description') else "User visible"
+            vision_queue.put({"type": "vision", "content": desc})
+            time.sleep(2) # Send a perception update every 2 seconds
+            
+        eyes.stop()
+    except Exception as e:
+        vision_queue.put({"status": "error", "error": str(e)})
+
 class ZaraConsciousness:
     """
     ZARA's Unified Autonomous Consciousness System.
@@ -260,6 +302,14 @@ class ZaraConsciousness:
         self.inner_circle = None
         self.unified_perception = None
         self.degrader = get_degrader()  # Needed immediately for start()
+        
+        # 🚀 NEW: Multiprocessing Nervous System
+        self.audio_queue = Queue()
+        self.vision_queue = Queue()
+        self.stop_event = Event()
+        self.audio_process = None
+        self.vision_process = None
+        self.latest_vision_context = "No visual data yet."
         
         logger.info("⏳ Minimal init done — full boot in start()")
 
@@ -453,19 +503,23 @@ class ZaraConsciousness:
         self.self_coder = get_self_coder(self.brain)
         gc.collect()
         
-        # Step 2: STT / Whisper (CPU — load BEFORE guardian/encryption)
-        logger.info("⏳ [2/6] Loading STT / Whisper (CPU)...")
+        # Step 2: STT / Whisper (ISOLATED PROCESS)
+        logger.info("⏳ [2/6] Spawning STT / Whisper (Isolated Process)...")
         try:
-            self.ears = HearingSystem()
-            logger.info("  ✓ Hearing System online")
+            self.audio_process = Process(
+                target=isolated_audio_worker, 
+                args=(self.audio_queue, self.stop_event),
+                daemon=True
+            )
+            self.audio_process.start()
+            logger.info("  ✓ Hearing System process spawned")
         except Exception as e:
-            logger.error(f"  ✗ Hearing System failed: {e}")
-            self.ears = None
+            logger.error(f"  ✗ Hearing System process failed: {e}")
             self.degrader.mark_degraded("ears", str(e))
         gc.collect()
         
-        # Step 3: Vision (CPU — Florence-2-base)
-        logger.info("⏳ [3/6] Loading Vision System (CPU)...")
+        # Step 3: Vision (ISOLATED PROCESS)
+        logger.info("⏳ [3/6] Spawning Vision System (Isolated Process)...")
         try:
             from config import MODELS
             _vision_enabled = MODELS.get("vision", {}).get("enabled", True)
@@ -474,15 +528,15 @@ class ZaraConsciousness:
         
         if _vision_enabled:
             try:
-                self.eyes = VisionSystem()
-                logger.info("  ✓ Vision System online")
-                self.gaze = GazeAnalyzer()
-                self.depth = DepthMapper()
-                self.object_detector = YOLO26Detector()
-                self.scene_encoder = InternViTEncoder()
+                self.vision_process = Process(
+                    target=isolated_vision_worker, 
+                    args=(self.vision_queue, self.stop_event),
+                    daemon=True
+                )
+                self.vision_process.start()
+                logger.info("  ✓ Vision System process spawned")
             except Exception as e:
-                logger.error(f"  ✗ Vision System failed: {e}")
-                self.eyes = None
+                logger.error(f"  ✗ Vision System process failed: {e}")
                 self.degrader.mark_degraded("eyes", str(e))
         else:
             logger.info("  ⚠ Vision disabled in config")
@@ -598,18 +652,7 @@ class ZaraConsciousness:
         
         # DISABLED for stability: eyes/ears/dashboard cause hard crashes
         # when their threads access shared state during conversation.
-        # Re-enable one-by-one after core loop works.
-        # if self.eyes:
-        #     _safe_start("eyes", self.eyes.start)
-        logger.info("  ⏭️ eyes: SKIPPED (stability mode)")
-        
-        # Load vision models (YOLO26 + InternViT)
-        # if self.object_detector:
-        #     _safe_start("yolo26", self.object_detector.load)
-        
-        # if self.ears:
-        #     _safe_start("ears", self.ears.start_listening)
-        logger.info("  ⏭️ ears: SKIPPED (stability mode)")
+        # Now replaced by true Isolated Multiprocessing Processes.
             
         _safe_start("heartbeat", self.heartbeat.start)
         _safe_start("interrupts", self.interrupts.start_listener)
@@ -653,6 +696,13 @@ class ZaraConsciousness:
         logger.info("Initiating consciousness hibernation...")
         self.is_running = False
         
+        # 🚀 Send Kill Signal to Isolated Organs
+        self.stop_event.set()
+        if self.audio_process and self.audio_process.is_alive():
+            self.audio_process.join(timeout=3)
+        if self.vision_process and self.vision_process.is_alive():
+            self.vision_process.join(timeout=3)
+        
         def _safe_stop(name: str, stop_fn):
             """Safely stop a service."""
             try:
@@ -663,10 +713,6 @@ class ZaraConsciousness:
         
         # Stop all services safely
         logger.info("Stopping background services...")
-        if self.eyes:
-            _safe_stop("eyes", self.eyes.stop)
-        if self.ears:
-            _safe_stop("ears", self.ears.stop_listening)
         _safe_stop("heartbeat", self.heartbeat.stop)
         _safe_stop("energy", self.energy.stop_monitoring)
         _safe_stop("resources", self.resources.stop)

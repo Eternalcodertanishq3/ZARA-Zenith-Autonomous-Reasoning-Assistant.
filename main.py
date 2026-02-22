@@ -1066,13 +1066,28 @@ class ZaraConsciousness:
             while self.is_running:
                 # Get frames
                 if self.avatar:
-                    # RENDER AVATAR
-                    current_state = self.soul.neuro.get_dominant_emotion() if (self.soul and hasattr(self.soul, 'neuro')) else "neutral"
+                    # 🚀 RENDER AVATAR (Bulletproof Dynamic Call)
+                    import inspect
+                    
                     is_talking = not self.audio_queue.empty() if hasattr(self, 'audio_queue') else False
-                    avatar_frame = self.avatar.get_next_frame(
-                        state=current_state,
-                        is_speaking=is_talking
-                    )
+                    current_emotion = self.soul.neuro.get_dominant_emotion() if (self.soul and hasattr(self.soul, 'neuro')) else "neutral"
+                    
+                    # Dynamically scan what your renderer.py actually accepts!
+                    sig = inspect.signature(self.avatar.get_next_frame)
+                    kwargs = {}
+                    
+                    # Feed it exactly what it asks for, nothing more, nothing less.
+                    if 'is_speaking' in sig.parameters:
+                        kwargs['is_speaking'] = is_talking
+                    if 'speaking' in sig.parameters:
+                        kwargs['speaking'] = is_talking
+                    if 'emotion' in sig.parameters:
+                        kwargs['emotion'] = current_emotion
+                    if 'state' in sig.parameters:
+                        kwargs['state'] = current_emotion
+                        
+                    # Call the frame generator safely!
+                    avatar_frame = self.avatar.get_next_frame(**kwargs)
                 else:
                     # Fallback if avatar is disabled
                     avatar_frame = np.zeros((480, 640, 3), dtype=np.uint8)

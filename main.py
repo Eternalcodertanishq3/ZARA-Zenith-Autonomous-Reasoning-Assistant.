@@ -716,7 +716,8 @@ class ZaraConsciousness:
         _safe_stop("heartbeat", self.heartbeat.stop)
         _safe_stop("energy", self.energy.stop_monitoring)
         _safe_stop("resources", self.resources.stop)
-        _safe_stop("firewall", self.firewall.stop_monitoring)
+        if hasattr(self, 'firewall') and self.firewall:
+            _safe_stop("firewall", self.firewall.stop_monitoring)
         _safe_stop("boredom", self.boredom.stop)
         _safe_stop("dreams", self.dreams.stop)
         
@@ -1064,11 +1065,18 @@ class ZaraConsciousness:
         try:
             while self.is_running:
                 # Get frames
-                current_mood = self.soul.current_mood if self.soul else "neutral"
-                avatar_frame = self.avatar.get_next_frame(
-                    audio_level=0.1,
-                    emotion=current_mood
-                )
+                if self.avatar:
+                    # RENDER AVATAR
+                    current_state = self.soul.neuro.get_dominant_emotion() if (self.soul and hasattr(self.soul, 'neuro')) else "neutral"
+                    is_talking = not self.audio_queue.empty() if hasattr(self, 'audio_queue') else False
+                    avatar_frame = self.avatar.get_next_frame(
+                        state=current_state,
+                        is_speaking=is_talking
+                    )
+                else:
+                    # Fallback if avatar is disabled
+                    avatar_frame = np.zeros((480, 640, 3), dtype=np.uint8)
+                    cv2.putText(avatar_frame, "Avatar Disabled", (200, 240), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2)
                 camera_frame = self.eyes.get_frame()
                 
                 # Combine frames
@@ -1080,7 +1088,7 @@ class ZaraConsciousness:
                     dashboard = avatar_frame
                 
                 # Add status overlay
-                status_text = f"Mood: {current_mood} | Consciousness: Active"
+                status_text = f"Mood: {current_state} | Consciousness: Active"
                 cv2.putText(
                     dashboard, status_text,
                     (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2

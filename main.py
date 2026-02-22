@@ -603,7 +603,7 @@ class ZaraConsciousness:
                 logger.error(f"  ✗ dashboard.zara link failed: {e}")
         self.guardian = _safe_init("guardian", GuardianMonitor)
         self.encryption = _safe_init("encryption", Encryptor)
-        self.firewall = _safe_init("firewall", lambda: FirewallPersona(alert_callback=self._security_alert))
+        # self.firewall = _safe_init("firewall", lambda: FirewallPersona(alert_callback=self._security_alert))
         self.wake_word = _safe_init("wake_word", WakeWordDetector)
         self.face_id = _safe_init("face_id", FaceID)
         self.compressor = _safe_init("compressor", ContextCompressor)
@@ -658,7 +658,7 @@ class ZaraConsciousness:
         _safe_start("interrupts", self.interrupts.start_listener)
         _safe_start("energy", self.energy.start_monitoring)
         _safe_start("resources", self.resources.start)
-        _safe_start("firewall", self.firewall.start_monitoring)
+        # _safe_start("firewall", self.firewall.start_monitoring)
         _safe_start("boredom", self.boredom.start)
         _safe_start("dreams", self.dreams.start)
         

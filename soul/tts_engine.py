@@ -1,52 +1,55 @@
 import logging
-import os
-import pyttsx3 # 🚀 NEW FAST ENGINE
+import threading
+import queue
+import pyttsx3
 
 logger = logging.getLogger("ZARA_SOUL")
 
 class TTSEngine:
     def __init__(self, config=None):
-        logger.info("Loading Fast Voice Engine (pyttsx3)...")
+        logger.info("Loading Bulletproof Fast Voice Engine (pyttsx3)...")
+        self.speech_queue = queue.Queue()
+        
+        # 🚀 Spawn a dedicated Voice Box thread
+        self.worker_thread = threading.Thread(target=self._speech_worker, daemon=True)
+        self.worker_thread.start()
+        logger.info("Voice Engine Online.")
+
+    def _speech_worker(self):
+        """This loops forever in the background, speaking words one by one safely."""
         try:
-            self.engine = pyttsx3.init()
-            
-            # Make her sound female and natural speed
-            voices = self.engine.getProperty('voices')
+            engine = pyttsx3.init()
+            voices = engine.getProperty('voices')
             if len(voices) > 1:
-                self.engine.setProperty('voice', voices[1].id) # Usually the female voice on Windows
-            self.engine.setProperty('rate', 165) # Speaking speed
+                engine.setProperty('voice', voices[1].id) # Female voice
+            engine.setProperty('rate', 165)
             
-            logger.info("Fast Voice Engine Online.")
+            while True:
+                text = self.speech_queue.get()
+                if text is None:
+                    break
+                try:
+                    engine.say(text)
+                    engine.runAndWait()
+                except Exception as e:
+                    logger.error(f"pyttsx3 error: {e}")
+                self.speech_queue.task_done()
         except Exception as e:
-            logger.error(f"Failed to initialize pyttsx3: {e}")
-            self.engine = None
+            logger.error(f"Failed to initialize Voice Engine thread: {e}")
 
     def speak(self, text, mood="neutral", blocking=True):
-        """Instant speech generation"""
-        if not self.engine or not text:
-            print(f"✨ ZARA: {text}")
+        """Instantly drops words into the queue without crashing the main thread."""
+        if not text:
             return
-        
         logger.info(f"Speaking: {text[:30]}...")
         # Clean text of any accidental tags or actions
         clean_text = text.replace("<think>", "").replace("</think>", "")
-        # Remove *actions*
         import re
         clean_text = re.sub(r'\*[^*]+\*', '', clean_text).strip()
         
-        try:
-            self.engine.say(clean_text)
-            self.engine.runAndWait()
-        except Exception as e:
-            logger.error(f"pyttsx3 speak failed: {e}")
-            print(f"✨ ZARA: {text}")
+        if clean_text:
+            self.speech_queue.put(clean_text)
 
     def speak_async(self, text: str, mood: str = "neutral"):
-        """Fast fallback for async (pyttsx3 is already very fast)"""
-        import threading
-        threading.Thread(target=self.speak, args=(text, mood, True), daemon=True).start()
-
-if __name__ == "__main__":
-    logging.basicConfig(level=logging.INFO)
-    tts = TTSEngine()
-    tts.speak("Hello Vivaan! This is ZARA's new ultra-fast voice.")
+        """Queues speech (already asynchronous due to worker thread)"""
+        self.speak(text, mood=mood, blocking=False)

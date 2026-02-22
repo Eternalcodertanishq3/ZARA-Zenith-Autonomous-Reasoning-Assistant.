@@ -977,102 +977,68 @@ class ZaraConsciousness:
     # ═══════════════════════════════════════════════════════════════════
     
     def run_interactive(self):
-        """Run the interactive conversation loop."""
+        """Phase 1: Fast Non-Blocking Terminal Loop"""
         self.start()
+        print("\n✨ [ZARA CORE ONLINE] - Awaiting Input (Speak or Type)...\n")
         
-        # ════════════════════════════════════════════════════════════════
-        # ALL SYSTEMS ONLINE - Interactive Mode Ready
-        # ════════════════════════════════════════════════════════════════
-        print("\n" + "═" * 60)
-        print("  🌟 ALL SYSTEMS ONLINE - ZARA Interactive Mode 🌟")
-        print("═" * 60)
-        print("  Type your message and press Enter to talk to ZARA")
-        print("  Say 'exit' or 'quit' to end the conversation")
-        print("═" * 60 + "\n")
-        logger.info("✅ Entered interactive mode - ready for conversation!")
+        # 🚀 1. The Keyboard Background Listener
+        import queue
+        keyboard_queue = queue.Queue()
         
-        # Audio processing thread DISABLED for stability testing
-        # Background audio + main thread both calling process_input/TTS
-        # causes hard C-level crashes. Re-enable after core loop is stable.
-        # if self.ears:
-        #     audio_thread = threading.Thread(
-        #         target=self._audio_processing_loop,
-        #         daemon=True,
-        #         name="AudioProcessing"
-        #     )
-        #     audio_thread.start()
-        #     logger.info("🎤 Voice input enabled - speak to ZARA!")
-        logger.info("⌨️ Text-only mode — type to talk to ZARA")
-        
-        last_proactive_check = time.time()
-        proactive_interval = 30  # Check every 30 seconds
-        
+        def keyboard_worker():
+            while True:
+                try:
+                    text = input()
+                    if text.strip():
+                        keyboard_queue.put(text.strip())
+                except EOFError:
+                    break
+                    
+        kb_thread = threading.Thread(target=keyboard_worker, daemon=True)
+        kb_thread.start()
+
+        print("👤 VIVAAN: ", end="", flush=True)
+
+        # 🚀 2. The High-Speed Perception Loop
         while self.is_running:
             try:
-                # 🧠 1. CHECK SENSORY QUEUES (The Nervous System)
-                # Check Vision
+                # -- Check Vision --
                 try:
                     while not self.vision_queue.empty():
                         v_data = self.vision_queue.get_nowait()
                         if v_data.get("type") == "vision":
                             self.latest_vision_context = v_data.get("content", "")
-                            logger.debug(f"Vision update: {self.latest_vision_context[:50]}...")
                 except queue.Empty:
                     pass
 
-                # Check Audio (If she hears you speak, process it automatically!)
+                # -- Check Audio (Her Ears!) --
                 try:
                     while not self.audio_queue.empty():
                         a_data = self.audio_queue.get_nowait()
                         if a_data.get("type") == "text":
                             spoken_text = a_data.get("content", "")
-                            print(f"\n🎤 [HEARD]: {spoken_text}")
-                            self.process_input(spoken_text) # Send spoken words to brain
+                            print(f"\n🎤 [HEARD VIA MIC]: {spoken_text}")
+                            self.process_input(spoken_text)
+                            print("\n👤 VIVAAN: ", end="", flush=True)
                 except queue.Empty:
                     pass
 
-                # ⌨️ 2. CHECK KEYBOARD INPUT
-                # Note: input() is blocking in terminal mode. 
-                # In GUI mode, this will be a non-blocking event loop.
+                # -- Check Keyboard --
                 try:
-                    user_input = input("\n👤 VIVAAN: ").strip()
-                except EOFError:
-                    break
-                
-                if not user_input:
-                    continue
-                
-                # Exit commands
-                if user_input.lower() in ["exit", "quit", "bye", "goodbye", "sleep"]:
-                    farewell = self.soul.get_farewell() if self.soul else "Goodbye! I'll miss you."
-                    if self.voice:
-                        self.voice.speak(farewell, mood="sad")
-                    else:
-                        print(f"✨ ZARA: {farewell}")
-                    self.stop()
-                    break
-                
-                # Process and respond
-                try:
-                    response = self.process_input(user_input)
-                    logger.info(f"✨ ZARA: {response}")
+                    user_input = keyboard_queue.get_nowait()
+                    if user_input.lower() in ['exit', 'quit', 'sleep']:
+                        self.stop()
+                        break
                     
-                    # Get current mood from soul
-                    current_mood = self.soul.current_mood if self.soul else "happy"
-                    
-                    # Speak response
-                    if self.voice:
-                        try:
-                            self.voice.speak(response, mood=current_mood)
-                        except Exception as tts_err:
-                            logger.error(f"TTS speak failed: {tts_err}")
-                            print(f"✨ ZARA: {response}")
-                    else:
-                        print(f"✨ ZARA: {response}")
-                except Exception as proc_err:
-                    logger.error(f"process_input crashed: {proc_err}")
-                    print(f"✨ ZARA: Sorry, I hit an error processing that. Try again!")
-                
+                    # Process the typed text
+                    self.process_input(user_input)
+                    print("\n👤 VIVAAN: ", end="", flush=True)
+                except queue.Empty:
+                    pass
+
+                # Sleep for 50ms so we don't fry your CPU doing the while loop!
+                time.sleep(0.05)
+
             except KeyboardInterrupt:
                 logger.info("Keyboard interrupt detected.")
                 self.stop()

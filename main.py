@@ -1183,12 +1183,12 @@ def _main_inner():
     if len(sys.argv) > 1:
         if sys.argv[1] == "--gui":
             zara.run_gui()
-        elif sys.argv[1] == "--text":
+        elif sys.argv[1] in ["--text", "--interactive"]:
             zara.run_interactive()
         elif sys.argv[1] == "--status":
             logger.info(f"Status: {zara.get_status()}")
         else:
-            print("Usage: python main.py [--gui|--text|--status]")
+            print("Usage: python main.py [--gui|--text|--interactive|--status]")
     else:
         # Default: interactive text mode
         zara.run_interactive()

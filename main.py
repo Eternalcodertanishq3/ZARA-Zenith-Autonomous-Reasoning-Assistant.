@@ -1048,81 +1048,70 @@ class ZaraConsciousness:
                 logger.error(f"Error in interactive loop: {e}", exc_info=True)
 
     def run_gui(self):
-        """Run with GUI (avatar window)."""
-        import cv2
-        import numpy as np
+        """[DEPRECATED] Legacy OpenCV GUI — use run_server_mode() instead.
         
+        The OpenCV rendering loop has been migrated to the WebGL holographic
+        frontend (frontend/index.html) running via the nervous system server.
+        Run `python main.py --server` then `python dashboard/native_app.py`.
+        """
+        logger.warning("run_gui() is deprecated. The avatar has migrated to the WebGL holographic frontend.")
+        logger.warning("Run `python main.py --server` to boot the headless brain.")
+        logger.warning("Run `python dashboard/native_app.py` to open the 3D avatar window.")
+        logger.info("Falling back to run_interactive() mode...")
+        self.run_interactive()
+
+    def run_server_mode(self):
+        """Phase 3 Integration: Boot ZARA headlessly and start the WebSocket nervous system.
+        
+        - RTX 4050 exclusively runs AI inference (no GPU wasted on graphics)
+        - FastAPI WebSocket server on 127.0.0.1:8000 bridges UI ↔ Brain
+        - All I/O flows through WebSocket; no stdin/stdout interaction loops
+        """
+        import asyncio
+        import uvicorn
+
+        logger.info("")
+        logger.info("🧠 ZARA SERVER MODE — Headless Brain + WebSocket Nervous System")
+        logger.info("═" * 60)
+
+        # Boot all 57 subsystems (GPU-only mode, no graphics)
         self.start()
-        
-        # Start brain thread
-        brain_thread = threading.Thread(
-            target=self._audio_processing_loop,
-            daemon=True
-        )
-        brain_thread.start()
-        
-        # GUI loop
+
+        # Import and wire the nervous system
         try:
-            while self.is_running:
-                # Get frames
-                if self.avatar:
-                    # 🚀 RENDER AVATAR (Bulletproof Dynamic Call)
-                    import inspect
-                    
-                    is_talking = not self.audio_queue.empty() if hasattr(self, 'audio_queue') else False
-                    current_emotion = self.soul.neuro.get_dominant_emotion() if (self.soul and hasattr(self.soul, 'neuro')) else "neutral"
-                    
-                    # Dynamically scan what your renderer.py actually accepts!
-                    sig = inspect.signature(self.avatar.get_next_frame)
-                    kwargs = {}
-                    
-                    # Feed it exactly what it asks for, nothing more, nothing less.
-                    if 'is_speaking' in sig.parameters:
-                        kwargs['is_speaking'] = is_talking
-                    if 'speaking' in sig.parameters:
-                        kwargs['speaking'] = is_talking
-                    if 'emotion' in sig.parameters:
-                        kwargs['emotion'] = current_emotion
-                    if 'state' in sig.parameters:
-                        kwargs['state'] = current_emotion
-                        
-                    # Call the frame generator safely!
-                    avatar_frame = self.avatar.get_next_frame(**kwargs)
-                else:
-                    # Fallback if avatar is disabled
-                    avatar_frame = np.zeros((480, 640, 3), dtype=np.uint8)
-                    cv2.putText(avatar_frame, "Avatar Disabled", (200, 240), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2)
-                camera_frame = self.eyes.get_frame()
-                
-                # Combine frames
-                if camera_frame is not None:
-                    h, w = avatar_frame.shape[:2]
-                    camera_resized = cv2.resize(camera_frame, (w, h))
-                    dashboard = np.hstack((avatar_frame, camera_resized))
-                else:
-                    dashboard = avatar_frame
-                
-                # Add status overlay
-                status_text = f"Mood: {current_state} | Consciousness: Active"
-                cv2.putText(
-                    dashboard, status_text,
-                    (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2
-                )
-                
-                cv2.imshow("ZARA Consciousness Interface", dashboard)
-                
-                key = cv2.waitKey(20) & 0xFF
-                if key == ord('q'):
-                    break
-                elif key == ord('s'):  # Stop emergency
-                    self.interrupts.emergency_stop()
-                    break
-                    
+            from server.nervous_system import build_app
+            app = build_app(self)
+            logger.info("✓ Nervous System app built")
+        except ImportError as e:
+            logger.critical(f"✗ Cannot import nervous_system: {e}")
+            logger.critical("  Run: pip install fastapi uvicorn[standard]")
+            self.stop()
+            return
+
+        # uvicorn config — fast, single-worker, no extra console noise
+        config = uvicorn.Config(
+            app,
+            host="127.0.0.1",
+            port=8000,
+            log_level="warning",
+            loop="asyncio",
+        )
+        server = uvicorn.Server(config)
+
+        logger.info("")
+        logger.info("🌐 WebSocket Nervous System ONLINE → ws://127.0.0.1:8000/ws/brain")
+        logger.info("🖥  Open the holographic UI     → http://127.0.0.1:8000/")
+        logger.info("🔲  Launch native window        → python dashboard/native_app.py")
+        logger.info("")
+
+        # Block on uvicorn (handles Ctrl+C gracefully)
+        try:
+            server.run()  # This is a blocking call
         except KeyboardInterrupt:
             pass
         finally:
-            cv2.destroyAllWindows()
             self.stop()
+            logger.info("💤 ZARA server mode shutdown complete.")
 
     def _audio_processing_loop(self):
         """Background loop for processing audio input."""
@@ -1204,17 +1193,19 @@ def _main_inner():
     
     # Parse arguments
     if len(sys.argv) > 1:
-        if sys.argv[1] == "--gui":
+        if sys.argv[1] == "--server":
+            zara.run_server_mode()
+        elif sys.argv[1] == "--gui":
             zara.run_gui()
         elif sys.argv[1] in ["--text", "--interactive"]:
             zara.run_interactive()
         elif sys.argv[1] == "--status":
             logger.info(f"Status: {zara.get_status()}")
         else:
-            print("Usage: python main.py [--gui|--text|--interactive|--status]")
+            print("Usage: python main.py [--server|--gui|--text|--interactive|--status]")
     else:
-        # Default: interactive text mode
-        zara.run_interactive()
+        # Default: server mode (headless brain + WebSocket)
+        zara.run_server_mode()
 
 
 if __name__ == "__main__":

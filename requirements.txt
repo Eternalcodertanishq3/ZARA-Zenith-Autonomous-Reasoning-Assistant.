@@ -73,6 +73,15 @@ requests>=2.31.0          # HTTP requests
 pydantic>=2.0.0           # Data validation
 
 # ============================================================================
+# NERVOUS SYSTEM / WEB SERVER (Phase 2-5 Migration)
+# ============================================================================
+fastapi>=0.110.0           # WebSocket API server (nervous system)
+uvicorn[standard]>=0.29.0  # ASGI server to run FastAPI
+python-multipart>=0.0.9    # FastAPI file upload support
+pywebview>=5.0             # Native borderless window wrapper (Phase 5)
+websockets>=12.0           # WebSocket client (for tests)
+
+# ============================================================================
 # DEVELOPMENT & TESTING
 # ============================================================================
 pytest>=7.4.0             # Testing framework

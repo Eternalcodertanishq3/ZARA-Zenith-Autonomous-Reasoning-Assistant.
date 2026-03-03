@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ZARA — Holographic Interface</title>
+    <meta
+      name="description"
+      content="ZARA AI — Zenith Autonomous Reasoning Assistant holographic interface"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/frontend/style.css" />
+  </head>
+  <body>
+    <!-- ═══════════════════════════════════════════════
+       THREE.JS CANVAS — VRM Avatar renders here
+       ═══════════════════════════════════════════════ -->
+    <canvas id="zara-canvas"></canvas>
+
+    <!-- ═══════════════════════════════════════════════
+       AMBIENT PARTICLE LAYER
+       ═══════════════════════════════════════════════ -->
+    <canvas id="particle-canvas"></canvas>
+
+    <!-- ═══════════════════════════════════════════════
+       HUD — Top bar
+       ═══════════════════════════════════════════════ -->
+    <header class="hud-header glass" id="hud-header">
+      <div class="hud-logo">
+        <div class="logo-hex">⬡</div>
+        <div class="logo-text">
+          <span class="logo-name">ZARA</span>
+          <span class="logo-sub"
+            >v4.0 · Zenith Autonomous Reasoning Assistant</span
+          >
+        </div>
+      </div>
+      <nav class="hud-nav">
+        <button class="nav-btn active" id="btn-dashboard">DASHBOARD</button>
+        <button class="nav-btn" id="btn-memory">MEMORY</button>
+        <button class="nav-btn" id="btn-goals">GOALS</button>
+        <button class="nav-btn" id="btn-settings">SETTINGS</button>
+      </nav>
+      <div class="hud-right">
+        <div class="status-pill" id="status-pill">
+          <span class="status-dot" id="status-dot"></span>
+          <span id="status-text">CONNECTING</span>
+        </div>
+        <div class="hud-time" id="hud-time">--:--</div>
+      </div>
+    </header>
+
+    <!-- ═══════════════════════════════════════════════
+       LEFT PANEL — System metrics
+       ═══════════════════════════════════════════════ -->
+    <aside class="side-panel side-left glass" id="panel-left">
+      <div class="panel-label">◈ NEURAL METRICS</div>
+
+      <div class="metric-block">
+        <div class="metric-header">
+          <span class="metric-icon">🧠</span>
+          <span>MOOD STATE</span>
+        </div>
+        <div class="mood-display" id="mood-display">NEUTRAL</div>
+        <div class="mood-bar-track">
+          <div class="mood-bar-fill" id="mood-bar"></div>
+        </div>
+      </div>
+
+      <div class="metric-block">
+        <div class="metric-header">
+          <span class="metric-icon">⚡</span><span>GPU VRAM</span>
+        </div>
+        <div class="metric-value" id="vram-val">-- GB</div>
+        <div class="bar-track">
+          <div class="bar-fill gpu-fill" id="vram-bar"></div>
+        </div>
+      </div>
+
+      <div class="metric-block">
+        <div class="metric-header">
+          <span class="metric-icon">🖥</span><span>CPU LOAD</span>
+        </div>
+        <div class="metric-value" id="cpu-val">--%</div>
+        <div class="bar-track">
+          <div class="bar-fill cpu-fill" id="cpu-bar"></div>
+        </div>
+      </div>
+
+      <div class="metric-block">
+        <div class="metric-header">
+          <span class="metric-icon">💾</span><span>RAM</span>
+        </div>
+        <div class="metric-value" id="ram-val">--%</div>
+        <div class="bar-track">
+          <div class="bar-fill ram-fill" id="ram-bar"></div>
+        </div>
+      </div>
+
+      <div class="metric-block subsystems">
+        <div class="panel-label">◈ SUBSYSTEMS</div>
+        <div class="sub-list" id="sub-list">
+          <div class="sub-item online"><span class="sub-dot"></span>Brain</div>
+          <div class="sub-item online"><span class="sub-dot"></span>Memory</div>
+          <div class="sub-item online"><span class="sub-dot"></span>Vision</div>
+          <div class="sub-item online"><span class="sub-dot"></span>Voice</div>
+          <div class="sub-item loading">
+            <span class="sub-dot"></span>Consciousness
+          </div>
+          <div class="sub-item loading"><span class="sub-dot"></span>Goals</div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- ═══════════════════════════════════════════════
+       CENTER — Avatar name plate & emotion ring
+       ═══════════════════════════════════════════════ -->
+    <div class="avatar-hud" id="avatar-hud">
+      <div class="emotion-ring" id="emotion-ring">
+        <svg viewBox="0 0 120 120" class="ring-svg">
+          <circle class="ring-track" cx="60" cy="60" r="54" />
+          <circle
+            class="ring-progress"
+            id="ring-progress"
+            cx="60"
+            cy="60"
+            r="54"
+          />
+        </svg>
+      </div>
+      <div class="avatar-name">ZARA</div>
+      <div class="avatar-state" id="avatar-state">Idle</div>
+      <div class="speaking-wave" id="speaking-wave">
+        <span></span><span></span><span></span><span></span><span></span>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════
+       RIGHT PANEL — Chat / Transcript
+       ═══════════════════════════════════════════════ -->
+    <aside class="side-panel side-right glass" id="panel-right">
+      <div class="panel-label">◈ TRANSCRIPT</div>
+      <div class="transcript" id="transcript">
+        <div class="msg system">
+          <span class="msg-name">SYSTEM</span>
+          <span class="msg-text">Initializing holographic interface...</span>
+        </div>
+      </div>
+
+      <div class="input-area">
+        <button class="mic-btn" id="mic-btn" title="Hold to speak">🎤</button>
+        <input
+          type="text"
+          class="chat-input"
+          id="chat-input"
+          placeholder="Speak or type to ZARA..."
+          autocomplete="off"
+          id="chat-input"
+        />
+        <button class="send-btn" id="send-btn" title="Send">➤</button>
+      </div>
+    </aside>
+
+    <!-- ═══════════════════════════════════════════════
+       BOTTOM — Control bar
+       ═══════════════════════════════════════════════ -->
+    <footer class="control-bar glass" id="control-bar">
+      <div class="ctrl-group">
+        <button class="ctrl-btn" id="btn-mute" title="Mute voice">🔊</button>
+        <button class="ctrl-btn" id="btn-camera" title="Toggle camera">
+          📷
+        </button>
+        <button class="ctrl-btn" id="btn-fullscreen" title="Fullscreen">
+          ⛶
+        </button>
+      </div>
+      <div class="ctrl-center">
+        <div class="ws-indicator" id="ws-indicator">
+          <span class="ws-dot"></span>
+          <span class="ws-label" id="ws-label"
+            >ws://127.0.0.1:8000/ws/brain</span
+          >
+        </div>
+      </div>
+      <div class="ctrl-group">
+        <button class="ctrl-btn danger" id="btn-end" title="End session">
+          ⏹ END
+        </button>
+      </div>
+    </footer>
+
+    <!-- ═══════════════════════════════════════════════
+       SCRIPTS — Three.js loaded from CDN (ESM)
+       ═══════════════════════════════════════════════ -->
+    <!-- Use importmap so bare specifiers work -->
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "https://cdn.jsdelivr.net/npm/three@0.164.1/build/three.module.js",
+          "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.164.1/examples/jsm/",
+          "@pixiv/three-vrm": "https://cdn.jsdelivr.net/npm/@pixiv/three-vrm@2.1.2/lib/three-vrm.module.js"
+        }
+      }
+    </script>
+    <script type="module" src="/frontend/zara_ui.js"></script>
+  </body>
+</html>

@@ -2,7 +2,7 @@
   "stage": "acquaintance",
   "trust": 0.3,
   "intimacy": 0.2,
-  "shared_experiences": 14,
+  "shared_experiences": 28,
   "inside_jokes": [],
   "pet_names": [],
   "special_memories": [],
@@ -14,7 +14,7 @@
       "to": "acquaintance"
     }
   ],
-  "total_interactions": 14,
+  "total_interactions": 28,
   "first_meeting": "2026-02-02T00:50:11.732785",
   "last_deep_conversation": null
 }

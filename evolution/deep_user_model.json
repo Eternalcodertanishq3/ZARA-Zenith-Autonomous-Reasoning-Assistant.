@@ -23,13 +23,15 @@
     "humor_appreciation": 0.6,
     "active_hours": {
       "0": 6,
-      "1": 4
+      "1": 4,
+      "13": 4,
+      "22": 4
     },
     "topic_interests": {}
   },
   "relationship_depth": {
     "trust_level": 0.5,
-    "familiarity": 0.4200000000000001,
+    "familiarity": 0.49000000000000016,
     "emotional_bond": 0.4,
     "shared_memories": [],
     "inside_jokes": [],

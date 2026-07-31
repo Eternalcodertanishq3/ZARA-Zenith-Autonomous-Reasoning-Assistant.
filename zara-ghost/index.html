@@ -1,104 +1,14 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ZARA</title>
-  <link rel="stylesheet" href="/src/styles.css" />
-</head>
-<body>
-  <canvas id="siri-canvas"></canvas>
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ZARA AI</title>
+  </head>
 
-  <div id="pill-overlay">
-    <!-- Header -->
-    <div id="win-header">
-      <div class="header-left">
-        <span id="task-label">Ask ZARA</span>
-      </div>
-    </div>
-
-    <!-- Content panels -->
-    <div id="win-content">
-      <!-- CHAT -->
-      <div id="layout-chat" class="layout">
-        <div class="chat-input-wrap">
-          <input type="text" id="chat-input" placeholder="Ask ZARA anything..." onkeydown="if(event.key==='Enter')sendMessage()"/>
-        </div>
-        <div class="chat-messages" id="chat-messages">
-          <div class="msg bot">System initialized. Gemma 4B loaded. Ready.</div>
-        </div>
-      </div>
-
-      <!-- CODE -->
-      <div id="layout-code" class="layout">
-        <div class="code-sidebar">
-          <div class="sidebar-title">FILES</div>
-          <div class="file-item active">main.py</div>
-          <div class="file-item">cognitive_core.py</div>
-          <div class="file-item">config.py</div>
-        </div>
-        <div class="code-editor">
-          <div class="code-line"><span class="kw">def</span> <span class="fn">process</span>(input):</div>
-          <div class="code-line">    <span class="cm"># ZARA processing</span></div>
-          <div class="code-line">    <span class="kw">return</span> model.generate(input)</div>
-        </div>
-      </div>
-
-      <!-- SYSTEM -->
-      <div id="layout-system" class="layout">
-        <div class="sys-grid">
-          <div class="sys-card">
-            <div class="sys-label">CPU</div>
-            <div class="sys-value" id="cpu-val">--</div>
-            <div class="sys-bar"><div class="sys-fill" style="width:0%"></div></div>
-          </div>
-          <div class="sys-card">
-            <div class="sys-label">RAM</div>
-            <div class="sys-value" id="ram-val">--</div>
-            <div class="sys-bar"><div class="sys-fill" style="width:0%"></div></div>
-          </div>
-          <div class="sys-card">
-            <div class="sys-label">GPU</div>
-            <div class="sys-value" id="gpu-val">--</div>
-            <div class="sys-bar"><div class="sys-fill" style="width:0%"></div></div>
-          </div>
-          <div class="sys-card">
-            <div class="sys-label">MODEL</div>
-            <div class="sys-value" style="font-size:14px">Gemma 4B Q4</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- VISION -->
-      <div id="layout-vision" class="layout">
-        <div class="vision-cam">CAM</div>
-        <div class="vision-text-wrap">
-          <div class="vision-title">Scene Analysis</div>
-          <div class="vision-desc" id="vision-text">Waiting for visual input...</div>
-        </div>
-        <div class="vision-tags">
-          <span class="tag">Idle</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- Mode Chips (embedded inside bottom of glass pill matching z1han chips) -->
-    <div id="mode-chips">
-      <button class="chip chip-chat active" onclick="morphTo('chat')" title="Chat">
-        <span class="chip-icon">💬</span> Chat
-      </button>
-      <button class="chip chip-code" onclick="morphTo('code')" title="Code">
-        <span class="chip-icon">⚡</span> Code
-      </button>
-      <button class="chip chip-sys" onclick="morphTo('system')" title="System">
-        <span class="chip-icon">◉</span> System
-      </button>
-      <button class="chip chip-eye" onclick="morphTo('vision')" title="Vision">
-        <span class="chip-icon">👁</span> Vision
-      </button>
-    </div>
-  </div>
-
-  <script type="module" src="/src/main.ts"></script>
-</body>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
 </html>

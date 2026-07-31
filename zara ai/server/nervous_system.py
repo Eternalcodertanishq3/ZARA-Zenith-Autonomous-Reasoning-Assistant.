@@ -192,6 +192,21 @@ def _get_emotion(zara) -> str:
     return 'neutral'
 
 
+def detect_task_type(text: str) -> str:
+    text_lower = text.lower()
+    code_keywords = ["code", "write", "function", "class", "def ", "import ", "bug", "error", "compile", "script"]
+    system_keywords = ["system", "cpu", "ram", "memory", "disk", "process", "kill", "usage", "temperature"]
+    vision_keywords = ["see", "look", "camera", "screen", "what is this", "describe", "identify"]
+    
+    if any(k in text_lower for k in code_keywords):
+        return "code"
+    if any(k in text_lower for k in system_keywords):
+        return "system"
+    if any(k in text_lower for k in vision_keywords):
+        return "vision"
+    return "chat"
+
+
 # ══════════════════════════════════════════════════════════════════════════════
 # BRAIN CALL — runs in thread pool so the event loop stays unblocked
 # Also triggers TTS on the pre-existing TTSEngine worker (fast, non-blocking)
@@ -343,20 +358,25 @@ def build_app(zara) -> FastAPI:
                     continue
 
                 # ── Text input (typed or transcribed from mic) ─────────────
-                if msg_type in ("text", "audio_b64"):
-                    content = data.get("content", "").strip()
+                if msg_type in ("text", "chat", "audio_b64"):
+                    content = data.get("content") or data.get("text", "")
+                    content = content.strip()
 
                     if msg_type == "audio_b64":
-                        # TODO: Implement STT decoding if Whisper is available.
-                        # For now, forward as a note to ZARA that audio arrived.
                         content = "[User sent voice message — STT bridging coming soon]"
 
                     if not content:
                         await manager.send_to(ws, {"type": "error", "message": "Empty input"})
                         continue
 
+                    # Detect and broadcast task morph state
+                    task_type = detect_task_type(content)
+                    await manager.broadcast({
+                        "type": "task_detected",
+                        "task": task_type
+                    })
+
                     # Run the brain in a thread so we don't block the event loop
-                    # TTS is triggered inside _call_brain_sync via voice.speak_async()
                     reply, emotion = await loop.run_in_executor(
                         _executor, _call_brain_sync, zara, content
                     )
@@ -367,7 +387,7 @@ def build_app(zara) -> FastAPI:
                         "text":      reply,
                         "emotion":   emotion,
                         "speaking":  True,
-                        "audio_b64": None,  # TTS handled by Python TTSEngine
+                        "audio_b64": None,
                     })
 
                     # Schedule speaking=False proportional to text length

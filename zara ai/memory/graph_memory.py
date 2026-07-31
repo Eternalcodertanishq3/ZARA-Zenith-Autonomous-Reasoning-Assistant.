@@ -535,6 +535,20 @@ class GraphMemory:
         # Optional vector store
         self._vector_store = None
         self._embedder = None
+        try:
+            from sentence_transformers import SentenceTransformer
+            self._embedder = SentenceTransformer('all-MiniLM-L6-v2')
+            logger.info("✓ SentenceTransformer (all-MiniLM-L6-v2) embedding model initialized")
+        except Exception as e:
+            logger.debug(f"SentenceTransformer lazy-load / info: {e}")
+
+    def _get_embedding(self, text: str) -> List[float]:
+        if self._embedder and text:
+            try:
+                return self._embedder.encode(text).tolist()
+            except Exception as e:
+                logger.warning(f"Embedding failed: {e}")
+        return []
         
         # Thread safety
         self.lock = threading.Lock()

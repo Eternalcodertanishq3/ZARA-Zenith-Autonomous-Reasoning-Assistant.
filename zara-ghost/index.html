@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ZARA</title>
+  <link rel="stylesheet" href="/src/styles.css" />
+</head>
+<body>
+  <div id="zara-container">
+    <!-- Idle Core -->
+    <div id="idle-core">
+      <div class="orb"></div>
+    </div>
+
+    <!-- Header -->
+    <div id="win-header">
+      <div class="header-left">
+        <div class="status-dot"></div>
+        <span id="task-label">IDLE</span>
+      </div>
+      <div class="header-right">
+        <button class="win-btn" onclick="minimize()">−</button>
+        <button class="win-btn" onclick="closeWindow()">×</button>
+      </div>
+    </div>
+
+    <!-- Content -->
+    <div id="win-content">
+      
+      <!-- CHAT -->
+      <div id="layout-chat" class="layout">
+        <div class="chat-messages" id="chat-messages">
+          <div class="msg bot">System initialized. Gemma 4B loaded. Ready.</div>
+        </div>
+        <div class="chat-input">
+          <input type="text" id="chat-input" placeholder="Say something..." onkeydown="if(event.key==='Enter')sendMessage()"/>
+          <button onclick="sendMessage()">➤</button>
+        </div>
+      </div>
+
+      <!-- CODE -->
+      <div id="layout-code" class="layout">
+        <div class="code-sidebar">
+          <div class="sidebar-title">FILES</div>
+          <div class="file-item active">main.py</div>
+          <div class="file-item">cognitive_core.py</div>
+          <div class="file-item">config.py</div>
+        </div>
+        <div class="code-editor">
+          <div class="code-line"><span class="kw">def</span> <span class="fn">process</span>(input):</div>
+          <div class="code-line">    <span class="cm"># ZARA processing</span></div>
+          <div class="code-line">    <span class="kw">return</span> model.generate(input)</div>
+        </div>
+      </div>
+
+      <!-- SYSTEM -->
+      <div id="layout-system" class="layout">
+        <div class="sys-grid">
+          <div class="sys-card">
+            <div class="sys-label">CPU</div>
+            <div class="sys-value" id="cpu-val">--</div>
+            <div class="sys-bar"><div class="sys-fill" style="width:0%"></div></div>
+          </div>
+          <div class="sys-card">
+            <div class="sys-label">RAM</div>
+            <div class="sys-value" id="ram-val">--</div>
+            <div class="sys-bar"><div class="sys-fill" style="width:0%"></div></div>
+          </div>
+          <div class="sys-card">
+            <div class="sys-label">GPU</div>
+            <div class="sys-value" id="gpu-val">--</div>
+            <div class="sys-bar"><div class="sys-fill" style="width:0%"></div></div>
+          </div>
+          <div class="sys-card">
+            <div class="sys-label">MODEL</div>
+            <div class="sys-value" style="font-size:14px">Gemma 4B Q4</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- VISION -->
+      <div id="layout-vision" class="layout">
+        <div class="vision-cam">CAM</div>
+        <div class="vision-text">
+          <div class="vision-title">Scene Analysis</div>
+          <div class="vision-desc">Waiting for visual input...</div>
+        </div>
+        <div class="vision-tags">
+          <span class="tag">Idle</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Corner Tabs -->
+    <div id="corner-tabs">
+      <button class="tab tab-chat" onclick="morphTo('chat')" title="Chat">💬</button>
+      <button class="tab tab-code" onclick="morphTo('code')" title="Code">⚡</button>
+      <button class="tab tab-sys" onclick="morphTo('system')" title="System">◉</button>
+      <button class="tab tab-eye" onclick="morphTo('vision')" title="Vision">👁</button>
+      <button class="tab tab-close" onclick="morphTo('idle')" title="Minimize">✕</button>
+    </div>
+  </div>
+
+  <!-- Drag handle (invisible, top area) -->
+  <div id="drag-handle" onmousedown="startDrag()"></div>
+
+  <script type="module" src="/src/main.ts"></script>
+</body>
+</html>

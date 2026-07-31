@@ -181,14 +181,16 @@ class ConsciousMind:
             model_names = [m.get('name', m.get('model', '')) for m in models.get('models', [])]
             
             if not any(self.ollama_model in name for name in model_names):
-                logger.error(f"❌ Model '{self.ollama_model}' not found in Ollama")
-                logger.error("Run: ollama create zara-brain -f brain/Modelfile")
-                return
+                if model_names:
+                    self.ollama_model = model_names[0]
+                    logger.info(f"✓ Selected available Ollama model: {self.ollama_model}")
+                else:
+                    logger.warning("⚠️ No model currently found in Ollama list.")
             
             # Ollama client is ready
             self.llm = ollama
             self.is_active = True
-            logger.info(f"🧠 Conscious Mind Online via Ollama: GPU-Accelerated.")
+            logger.info(f"🧠 Conscious Mind Online via Ollama ({self.ollama_model}).")
             
         except ImportError:
             logger.error("❌ Ollama not installed. Run: pip install ollama")

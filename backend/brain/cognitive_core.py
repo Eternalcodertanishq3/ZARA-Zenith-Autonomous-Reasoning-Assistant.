@@ -293,6 +293,29 @@ class ConsciousMind:
         # Update metrics
         self._update_metrics(processing_time, spoken_tokens)
 
+    def execute_tool_json(self, prompt: str) -> Optional[dict]:
+        """
+        Force JSON output mode from Ollama for structured tool calling.
+        """
+        if not self.is_active or not self.llm:
+            return None
+        try:
+            import json
+            response = self.llm.chat(
+                model=self.ollama_model,
+                messages=[
+                    {"role": "system", "content": "You are a JSON function caller. Output ONLY valid JSON."},
+                    {"role": "user", "content": prompt}
+                ],
+                format="json",
+                options={"temperature": 0.1}
+            )
+            raw = response.get("message", {}).get("content", "")
+            return json.loads(raw)
+        except Exception as e:
+            logger.warning(f"JSON tool mode failed: {e}")
+            return None
+
     # ═══════════════════════════════════════════════════════════════════
     # PERCEPTION
     # ═══════════════════════════════════════════════════════════════════

@@ -36,7 +36,7 @@ html, body {
 }
 
 /* ═════════════════════════════════════════════════════════════
-   LIQUID GLASS ORB
+   3D IRIDESCENT LIQUID CRYSTAL SPHERE (SIRI GLASS ORB)
    ═════════════════════════════════════════════════════════════ */
 
 #idle-core {
@@ -45,164 +45,208 @@ html, body {
   display: flex;
   align-items: center;
   justify-content: center;
+  background: transparent !important;
 }
 
 .orb-container {
   position: relative;
-  width: 120px;
-  height: 120px;
+  width: 110px;
+  height: 110px;
   display: flex;
   align-items: center;
   justify-content: center;
+  background: transparent !important;
 }
 
 .orb {
   position: relative;
-  width: 100px;
-  height: 100px;
+  width: 96px;
+  height: 96px;
   border-radius: 50%;
+  /* Crystal sphere base translucency */
   background: radial-gradient(
-    circle at 30% 30%,
-    rgba(255, 255, 255, 0.4) 0%,
-    rgba(255, 200, 220, 0.15) 20%,
-    rgba(180, 220, 255, 0.1) 40%,
-    rgba(255, 180, 140, 0.08) 60%,
-    rgba(200, 180, 255, 0.05) 80%,
-    transparent 100%
+    circle at 35% 30%,
+    rgba(255, 255, 255, 0.6) 0%,
+    rgba(56, 189, 248, 0.25) 20%,
+    rgba(217, 70, 239, 0.2) 45%,
+    rgba(15, 23, 42, 0.85) 85%,
+    rgba(2, 6, 23, 0.95) 100%
   );
   box-shadow:
-    inset 0 0 30px rgba(255, 255, 255, 0.2),
-    inset 0 0 60px rgba(255, 200, 220, 0.1),
-    0 0 40px rgba(255, 200, 220, 0.3),
-    0 0 80px rgba(180, 220, 255, 0.2),
-    0 0 120px rgba(255, 180, 140, 0.1),
-    0 20px 40px rgba(0, 0, 0, 0.4);
-  backdrop-filter: blur(8px) saturate(1.5);
-  border: 1px solid rgba(255, 255, 255, 0.25);
+    /* Deep Inner Fresnel Glow */
+    inset 0 0 25px rgba(255, 255, 255, 0.4),
+    inset -10px -10px 30px rgba(217, 70, 239, 0.4),
+    inset 10px 10px 30px rgba(56, 189, 248, 0.35),
+    /* Outer Iridescent Aura */
+    0 0 25px rgba(217, 70, 239, 0.45),
+    0 0 50px rgba(56, 189, 248, 0.3),
+    0 0 80px rgba(244, 63, 94, 0.2);
+  backdrop-filter: blur(12px) saturate(1.8);
+  border: 1px solid rgba(255, 255, 255, 0.45);
   overflow: hidden;
-  animation: orbBreathe 4s ease-in-out infinite;
+  animation: orbFloat 4s ease-in-out infinite;
   transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
               box-shadow 0.4s ease;
   cursor: pointer;
 }
 
 .orb:hover {
-  transform: scale(1.12);
+  transform: scale(1.1);
   box-shadow:
-    inset 0 0 40px rgba(255, 255, 255, 0.3),
-    inset 0 0 80px rgba(255, 200, 220, 0.15),
-    0 0 60px rgba(255, 200, 220, 0.4),
-    0 0 100px rgba(180, 220, 255, 0.3),
-    0 0 140px rgba(255, 180, 140, 0.15),
-    0 25px 50px rgba(0, 0, 0, 0.5);
+    inset 0 0 35px rgba(255, 255, 255, 0.6),
+    inset -12px -12px 40px rgba(217, 70, 239, 0.6),
+    inset 12px 12px 40px rgba(56, 189, 248, 0.5),
+    0 0 35px rgba(217, 70, 239, 0.65),
+    0 0 70px rgba(56, 189, 248, 0.45),
+    0 0 110px rgba(244, 63, 94, 0.3);
 }
 
-.orb-liquid {
+/* Glowing Inner Deep Core Wave */
+.orb-core-wave {
   position: absolute;
-  inset: -50%;
-  border-radius: 50%;
-  background: conic-gradient(
-    from 0deg,
-    rgba(255, 180, 200, 0.4),
-    rgba(180, 220, 255, 0.3),
-    rgba(255, 220, 180, 0.4),
-    rgba(220, 180, 255, 0.3),
-    rgba(255, 180, 200, 0.4)
-  );
-  filter: blur(20px);
-  animation: liquidFlow 8s linear infinite;
-  opacity: 0.6;
-}
-
-.orb-inner {
-  position: absolute;
-  inset: 15%;
-  border-radius: 50%;
+  inset: 10%;
+  border-radius: 42% 58% 65% 35% / 45% 45% 55% 55%;
   background: radial-gradient(
-    circle at 40% 40%,
-    rgba(255, 255, 255, 0.5) 0%,
-    rgba(255, 200, 220, 0.2) 30%,
-    rgba(180, 220, 255, 0.1) 60%,
+    circle at 50% 50%,
+    rgba(244, 63, 94, 0.85) 0%,
+    rgba(217, 70, 239, 0.75) 40%,
+    rgba(56, 189, 248, 0.5) 75%,
     transparent 100%
   );
-  filter: blur(2px);
-  animation: innerShift 6s ease-in-out infinite;
+  filter: blur(8px);
+  animation: coreMorph 6s ease-in-out infinite alternate;
+  mix-blend-mode: screen;
 }
 
-.orb-highlight {
+/* Swirling Liquid Fluid Ribbon 1 */
+.orb-liquid-ribbon-1 {
   position: absolute;
-  top: 8%;
-  left: 15%;
-  width: 35%;
-  height: 25%;
+  inset: -20%;
+  border-radius: 48% 52% 68% 32% / 42% 58% 42% 58%;
+  background: conic-gradient(
+    from 45deg,
+    rgba(56, 189, 248, 0.7),
+    rgba(217, 70, 239, 0.8),
+    rgba(244, 63, 94, 0.7),
+    rgba(168, 85, 247, 0.6),
+    rgba(56, 189, 248, 0.7)
+  );
+  filter: blur(14px);
+  animation: ribbonSpin1 8s linear infinite;
+  opacity: 0.8;
+  mix-blend-mode: color-dodge;
+}
+
+/* Swirling Liquid Fluid Ribbon 2 */
+.orb-liquid-ribbon-2 {
+  position: absolute;
+  inset: -15%;
+  border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+  background: radial-gradient(
+    ellipse at 60% 40%,
+    rgba(255, 255, 255, 0.9) 0%,
+    rgba(244, 63, 94, 0.6) 30%,
+    rgba(56, 189, 248, 0.4) 70%,
+    transparent 100%
+  );
+  filter: blur(10px);
+  animation: ribbonSpin2 10s ease-in-out infinite alternate;
+  opacity: 0.85;
+  mix-blend-mode: screen;
+}
+
+/* Sharp Glossy Glass Surface Reflection */
+.orb-glass-reflection {
+  position: absolute;
+  top: 5%;
+  left: 12%;
+  width: 45%;
+  height: 30%;
+  border-radius: 50%;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.95) 0%,
+    rgba(255, 255, 255, 0.4) 45%,
+    transparent 80%
+  );
+  filter: blur(1px);
+  transform: rotate(-25deg);
+  animation: reflectionGlint 4s ease-in-out infinite alternate;
+}
+
+/* Bottom Crescent Fresnel Edge Rim */
+.orb-fresnel-rim {
+  position: absolute;
+  bottom: 4%;
+  right: 10%;
+  width: 40%;
+  height: 20%;
   border-radius: 50%;
   background: radial-gradient(
     ellipse at center,
-    rgba(255, 255, 255, 0.9) 0%,
-    rgba(255, 255, 255, 0.4) 40%,
-    transparent 70%
+    rgba(255, 255, 255, 0.85) 0%,
+    rgba(217, 70, 239, 0.5) 50%,
+    transparent 80%
   );
-  filter: blur(3px);
-  transform: rotate(-20deg);
-  animation: highlightShimmer 3s ease-in-out infinite alternate;
-}
-
-.orb-caustic {
-  position: absolute;
-  inset: 0;
-  border-radius: 50%;
-  background: 
-    radial-gradient(circle at 70% 70%, rgba(255, 255, 255, 0.15) 0%, transparent 50%),
-    radial-gradient(circle at 30% 80%, rgba(180, 220, 255, 0.1) 0%, transparent 40%);
+  filter: blur(2px);
+  transform: rotate(15deg);
   mix-blend-mode: overlay;
-  animation: causticShift 5s ease-in-out infinite alternate;
 }
 
-.orb-shadow {
+/* Floor Caustic Glow */
+.orb-glow-floor {
   position: absolute;
-  bottom: -10px;
+  bottom: -6px;
   left: 50%;
   transform: translateX(-50%);
-  width: 70%;
-  height: 15px;
+  width: 65px;
+  height: 12px;
   border-radius: 50%;
-  background: radial-gradient(ellipse at center, rgba(0,0,0,0.3) 0%, transparent 70%);
+  background: radial-gradient(
+    ellipse at center,
+    rgba(217, 70, 239, 0.6) 0%,
+    rgba(56, 189, 248, 0.3) 50%,
+    transparent 80%
+  );
   filter: blur(8px);
-  animation: shadowBreathe 4s ease-in-out infinite;
+  animation: floorGlowPulse 4s ease-in-out infinite;
 }
 
-@keyframes orbBreathe {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.03); }
+/* ═════════════════════════════════════════════════════════════
+   FLUID ANIMATIONS
+   ═════════════════════════════════════════════════════════════ */
+
+@keyframes orbFloat {
+  0%, 100% { transform: translateY(0px) scale(1); }
+  50% { transform: translateY(-4px) scale(1.02); }
 }
 
-@keyframes liquidFlow {
+@keyframes coreMorph {
+  0% { border-radius: 42% 58% 65% 35% / 45% 45% 55% 55%; transform: rotate(0deg) scale(1); }
+  50% { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; transform: rotate(180deg) scale(1.1); }
+  100% { border-radius: 35% 65% 45% 55% / 55% 35% 65% 45%; transform: rotate(360deg) scale(0.95); }
+}
+
+@keyframes ribbonSpin1 {
   0% { transform: rotate(0deg) scale(1); }
-  33% { transform: rotate(120deg) scale(1.1); }
-  66% { transform: rotate(240deg) scale(0.95); }
+  50% { transform: rotate(180deg) scale(1.08); }
   100% { transform: rotate(360deg) scale(1); }
 }
 
-@keyframes innerShift {
-  0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.8; }
-  25% { transform: translate(3%, -3%) scale(1.05); opacity: 1; }
-  50% { transform: translate(-2%, 2%) scale(0.95); opacity: 0.7; }
-  75% { transform: translate(2%, 3%) scale(1.02); opacity: 0.9; }
+@keyframes ribbonSpin2 {
+  0% { transform: rotate(0deg) translate(0, 0); }
+  50% { transform: rotate(-120deg) translate(4px, -4px); }
+  100% { transform: rotate(-240deg) translate(-3px, 3px); }
 }
 
-@keyframes highlightShimmer {
-  0% { opacity: 0.7; transform: rotate(-20deg) translateX(0); }
-  100% { opacity: 1; transform: rotate(-15deg) translateX(5px); }
+@keyframes reflectionGlint {
+  0% { opacity: 0.8; transform: rotate(-25deg) scale(1); }
+  100% { opacity: 1; transform: rotate(-15deg) scale(1.08); }
 }
 
-@keyframes causticShift {
-  0% { opacity: 0.5; transform: scale(1); }
-  100% { opacity: 0.8; transform: scale(1.1) rotate(10deg); }
-}
-
-@keyframes shadowBreathe {
-  0%, 100% { opacity: 0.4; transform: translateX(-50%) scale(1); }
-  50% { opacity: 0.6; transform: translateX(-50%) scale(1.1); }
+@keyframes floorGlowPulse {
+  0%, 100% { opacity: 0.5; transform: translateX(-50%) scale(1); }
+  50% { opacity: 0.85; transform: translateX(-50%) scale(1.15); }
 }
 
 /* Header */

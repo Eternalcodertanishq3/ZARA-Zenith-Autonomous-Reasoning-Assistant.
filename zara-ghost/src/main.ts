@@ -181,10 +181,17 @@ function drawOrbitRings(
   isBack: boolean
 ) {
   const numRings = 3;
+  const colors = [
+    'rgba(56, 189, 248, 0.85)', // Cyan
+    'rgba(192, 132, 252, 0.75)', // Purple
+    'rgba(244, 63, 94, 0.75)',  // Rose Red
+  ];
+
   for (let i = 0; i < numRings; i++) {
-    const rx = r * 1.35;
-    const ry = r * 0.38 + Math.sin(time + i) * 6;
-    const rot = -0.3 + i * 0.3;
+    const rx = r * 1.32;
+    const ry = r * 0.38 + Math.sin(time * 1.2 + i) * 5;
+    const rot = -0.35 + i * 0.35;
+    const baseColor = colors[i % colors.length];
 
     ctx.save();
     ctx.translate(cx, cy);
@@ -194,17 +201,19 @@ function drawOrbitRings(
     const startAngle = isBack ? Math.PI : 0;
     const endAngle = isBack ? Math.PI * 2 : Math.PI;
 
-    ctx.beginPath();
-    ctx.ellipse(0, 0, rx, ry, 0, startAngle, endAngle);
-    ctx.lineWidth = 2.5 - i * 0.5;
+    // Draw multi-strand wave ribbon bundle (matching Siri Reference Image 2)
+    const strands = 4;
+    for (let s = 0; s < strands; s++) {
+      const strandOffsetY = (s - (strands - 1) / 2) * 2.8;
+      ctx.beginPath();
+      ctx.ellipse(0, strandOffsetY, rx, ry + s * 0.8, 0, startAngle, endAngle);
+      ctx.lineWidth = s === 1 || s === 2 ? 1.8 : 1.0;
+      ctx.strokeStyle = baseColor;
+      ctx.shadowBlur = 8;
+      ctx.shadowColor = baseColor;
+      ctx.stroke();
+    }
 
-    const colors = [
-      'rgba(56, 189, 248, 0.85)', // Cyan
-      'rgba(192, 132, 252, 0.75)', // Purple
-      'rgba(244, 63, 94, 0.7)',   // Rose
-    ];
-    ctx.strokeStyle = colors[i % colors.length];
-    ctx.stroke();
     ctx.restore();
   }
 }
@@ -295,22 +304,19 @@ function initSiriCanvas() {
     coreGrad.addColorStop(1, 'rgba(255, 255, 255, 0)');
     ctx.fillStyle = coreGrad;
     ctx.beginPath();
-    ctx.arc(coreX, coreY, r * 0.5, 0, Math.PI * 2);
+    ctx.arc(coreX, coreY, r * 0.45, 0, Math.PI * 2);
     ctx.fill();
 
     ctx.restore();
 
-    // 3. 3D Glass Shell Glint & Fresnel Border
+    // 3. 3D Glass Shell Glint (NO white stroke line border)
     ctx.save();
     ctx.beginPath();
     ctx.arc(cx, cy, r, 0, Math.PI * 2);
-    ctx.lineWidth = 2;
-    ctx.strokeStyle = 'rgba(255, 255, 255, 0.45)';
-    ctx.stroke();
 
     const glassGrad = ctx.createLinearGradient(cx - r, cy - r, cx + r, cy + r);
-    glassGrad.addColorStop(0, 'rgba(255, 255, 255, 0.5)');
-    glassGrad.addColorStop(0.2, 'rgba(255, 255, 255, 0.12)');
+    glassGrad.addColorStop(0, 'rgba(255, 255, 255, 0.45)');
+    glassGrad.addColorStop(0.2, 'rgba(255, 255, 255, 0.1)');
     glassGrad.addColorStop(0.5, 'transparent');
     ctx.fillStyle = glassGrad;
     ctx.fill();

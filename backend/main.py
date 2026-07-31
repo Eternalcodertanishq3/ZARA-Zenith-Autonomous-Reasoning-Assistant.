@@ -140,10 +140,10 @@ from pulse.priority_interrupt import PriorityInterrupt
 from pulse.dream_processor import get_dreams
 
 # ═══════════════════════════════════════════════════════════════════
-# Phase IX-XII: Advanced Consciousness Systems
+# Phase IX-XII: Advanced Consciousness Systems (COMMENTED OUT FOR STABILITY & SPEED)
 # ═══════════════════════════════════════════════════════════════════
-from soul.neuro_state import get_neurochemistry, Stimulus, StimulusType
-from mind.intrinsic_motivation import get_motivation
+# from soul.neuro_state import get_neurochemistry, Stimulus, StimulusType
+# from mind.intrinsic_motivation import get_motivation
 from mind.world_model import get_world_model, ActionType
 from mind.metacognition import get_metacognition
 
@@ -151,12 +151,12 @@ from mind.metacognition import get_metacognition
 from mind.system2_reasoner import get_system2_reasoner
 from mind.social_intelligence import get_social_intelligence
 from mind.empathy_engine import get_empathy_engine
-from mind.meta_awareness import get_meta_awareness
+# from mind.meta_awareness import get_meta_awareness
 from mind.creative_synthesis import get_creative_synthesis
 from mind.dream_mode import get_dream_engine
 
 # Evolution & Learning
-from evolution.self_evolution import get_evolution_engine
+# from evolution.self_evolution import get_evolution_engine
 from learning.continuous_learning import get_continuous_learner
 
 # Multi-Agent System
@@ -615,17 +615,21 @@ class ZaraConsciousness:
         self.deployer = _safe_init("deployer", Deployer)
         self.boredom = _safe_init("boredom", lambda: BoredomThread(speak_callback=self._proactive_speak))
         self.latency = _safe_init("latency", lambda: LatencyBuffer(speak_callback=self._say_filler))
-        self.neurochemistry = _safe_init("neurochemistry", get_neurochemistry)
-        self.motivation = _safe_init("motivation", get_motivation)
+        # self.neurochemistry = _safe_init("neurochemistry", get_neurochemistry)
+        # self.motivation = _safe_init("motivation", get_motivation)
+        self.neurochemistry = None
+        self.motivation = None
         self.world_model = _safe_init("world_model", get_world_model)
         self.metacognition = _safe_init("metacognition", get_metacognition)
         self.system2 = _safe_init("system2", get_system2_reasoner)
         self.social_intel = _safe_init("social_intel", get_social_intelligence)
         self.empathy = _safe_init("empathy", get_empathy_engine)
-        self.meta_awareness = _safe_init("meta_awareness", get_meta_awareness)
+        # self.meta_awareness = _safe_init("meta_awareness", get_meta_awareness)
+        self.meta_awareness = None
         self.creative = _safe_init("creative", get_creative_synthesis)
         self.dream_mode = _safe_init("dream_mode", get_dream_engine)
-        self.self_evolution = _safe_init("self_evolution", get_evolution_engine)
+        # self.self_evolution = _safe_init("self_evolution", get_evolution_engine)
+        self.self_evolution = None
         self.continuous_learning = _safe_init("continuous_learning", get_continuous_learner)
         self.hand_spawner = _safe_init("hand_spawner", get_hand_spawner)
         self.inner_circle = _safe_init("inner_circle", InnerCircle)
@@ -650,28 +654,22 @@ class ZaraConsciousness:
         # Start background services with error handling
         logger.info("Starting background services...")
         
-        # DISABLED for stability: eyes/ears/dashboard cause hard crashes
-        # when their threads access shared state during conversation.
-        # Now replaced by true Isolated Multiprocessing Processes.
-            
         _safe_start("heartbeat", self.heartbeat.start)
         _safe_start("interrupts", self.interrupts.start_listener)
         _safe_start("energy", self.energy.start_monitoring)
         _safe_start("resources", self.resources.start)
         # _safe_start("firewall", self.firewall.start_monitoring)
         _safe_start("boredom", self.boredom.start)
-        _safe_start("dreams", self.dreams.start)
+        # _safe_start("dreams", self.dreams.start)
         
-        # if self.dashboard:
-        #     _safe_start("dashboard", lambda: self.dashboard.start(self))
         logger.info("  ⏭️ dashboard: SKIPPED (stability mode)")
         if hasattr(self.consciousness, 'start_background_learning'):
             _safe_start("consciousness_learning", self.consciousness.start_background_learning)
         if hasattr(self.knowledge, 'start_background_processing'):
             _safe_start("knowledge_processing", self.knowledge.start_background_processing)
         
-        _safe_start("neurochemistry", self.neurochemistry.start)
-        _safe_start("motivation", self.motivation.start)
+        # _safe_start("neurochemistry", self.neurochemistry.start)
+        # _safe_start("motivation", self.motivation.start)
         _safe_start("metacognition", self.metacognition.start)
         _safe_start("hand_spawner", self.hand_spawner.start)
         

@@ -19,30 +19,30 @@ const layouts: Record<string, { w: number; h: number; radius: string }> = {
 let ws: WebSocket | null = null;
 let currentTask = 'idle';
 
-// Connect to ZARA backend
+// Single clean WebSocket connection
 function connectWS() {
-  // Try port 8765 first, fallback to 8000/ws/brain
-  const urls = ['ws://localhost:8765', 'ws://localhost:8000/ws/brain'];
-  let currentUrlIdx = 0;
-
-  function tryConnect() {
-    ws = new WebSocket(urls[currentUrlIdx]);
-    ws.onopen = () => console.log(`Connected to ZARA brain at ${urls[currentUrlIdx]}`);
-    ws.onmessage = (e) => {
-      try {
-        const data = JSON.parse(e.data);
-        if (data.type === 'response' && data.text) addMessage(data.text, 'bot');
-        if (data.type === 'task_detected' && data.task) morphTo(data.task);
-      } catch (err) {
-        console.error('Error parsing WS message', err);
+  const wsUrl = 'ws://localhost:8000/ws/brain';
+  
+  ws = new WebSocket(wsUrl);
+  ws.onopen = () => console.log(`Connected to ZARA nervous system at ${wsUrl}`);
+  ws.onmessage = (e) => {
+    try {
+      const data = JSON.parse(e.data);
+      if (data.type === 'response' && data.text) {
+        addMessage(data.text, 'bot');
       }
-    };
-    ws.onerror = () => {
-      currentUrlIdx = (currentUrlIdx + 1) % urls.length;
-    };
-    ws.onclose = () => setTimeout(tryConnect, 3000);
-  }
-  tryConnect();
+      if (data.type === 'task_detected' && data.task) {
+        morphTo(data.task);
+      }
+    } catch (err) {
+      console.warn('Received non-JSON message:', e.data);
+      if (typeof e.data === 'string' && e.data.trim()) {
+        addMessage(e.data, 'bot');
+      }
+    }
+  };
+  ws.onerror = (err) => console.error('WebSocket error:', err);
+  ws.onclose = () => setTimeout(connectWS, 3000);
 }
 connectWS();
 
@@ -54,7 +54,7 @@ function morphTo(task: string) {
   container.style.height = `${L.h}px`;
   container.style.borderRadius = L.radius;
   
-  // Call Rust to sync native window
+  // Call Rust to sync native window position & size
   try {
     invoke('morph_window', { task });
   } catch (e) {
@@ -109,7 +109,7 @@ function sendMessage() {
   addMessage(text, 'user');
   input.value = '';
   
-  // Auto detect task locally if offline
+  // Auto detect task locally if offline fallback
   const detected = detectTask(text);
   if (detected !== 'chat') morphTo(detected);
 
@@ -137,9 +137,9 @@ function closeWindow() {
 
 function detectTask(text: string): string {
   const t = text.toLowerCase();
-  if (t.includes('code') || t.includes('write') || t.includes('function') || t.includes('def ')) return 'code';
-  if (t.includes('system') || t.includes('cpu') || t.includes('ram')) return 'system';
-  if (t.includes('see') || t.includes('look') || t.includes('camera')) return 'vision';
+  if (t.includes('write a function') || t.includes('python script') || t.includes('code for me')) return 'code';
+  if (t.includes('cpu usage') || t.includes('ram usage') || t.includes('system stats')) return 'system';
+  if (t.includes('what do you see') || t.includes('look at my screen') || t.includes('camera on')) return 'vision';
   return 'chat';
 }
 

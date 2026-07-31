@@ -2,24 +2,25 @@ use tauri::{WebviewWindow, Position, Size, LogicalSize, LogicalPosition};
 
 #[tauri::command]
 async fn morph_window(window: WebviewWindow, task: String) {
+    let monitor = match window.current_monitor() {
+        Ok(Some(m)) => m,
+        _ => return,
+    };
+    
+    let scale_factor = monitor.scale_factor();
+    let screen_size = monitor.size().to_logical::<f64>(scale_factor);
+
     let (w, h, x, y, click_through) = match task.as_str() {
-        "idle"   => (80.0,  80.0,  "Calc(100% - 120)", "Calc(100% - 120)", true),
-        "chat"   => (420.0, 680.0, "Calc(100% - 460)",  "Calc(100% - 720)", false),
-        "code"   => (900.0, 520.0, "Calc(100% - 940)",  "Calc(100% - 560)", false),
-        "system" => (380.0, 380.0, "Calc(100% - 420)",  "Calc(100% - 420)", false),
-        "vision" => (700.0, 140.0, "Calc(50% - 350)",   "40",               false),
+        "idle"   => (80.0,  80.0,  screen_size.width - 120.0, screen_size.height - 120.0, true),
+        "chat"   => (420.0, 680.0, screen_size.width - 460.0,  screen_size.height - 720.0, false),
+        "code"   => (900.0, 520.0, screen_size.width - 940.0,  screen_size.height - 560.0, false),
+        "system" => (380.0, 380.0, screen_size.width - 420.0,  screen_size.height - 420.0, false),
+        "vision" => (700.0, 140.0, (screen_size.width - 700.0) / 2.0, 40.0, false),
         _ => return,
     };
 
     let _ = window.set_size(Size::Logical(LogicalSize { width: w, height: h }));
-    let _ = window.set_position(Position::Logical(LogicalPosition { x: 0.0, y: 0.0 }));
-    
-    let _ = window.eval(&format!(
-        "window.moveTo({{x: {}, y: {}}})",
-        if x.starts_with("Calc") { "window.screen.availWidth - 460" } else { "window.screen.availWidth / 2 - 350" },
-        if y.starts_with("Calc") && y.contains("100%") { "window.screen.availHeight - 720" } else { "40" }
-    ));
-    
+    let _ = window.set_position(Position::Logical(LogicalPosition { x, y }));
     let _ = window.set_ignore_cursor_events(click_through);
 }
 

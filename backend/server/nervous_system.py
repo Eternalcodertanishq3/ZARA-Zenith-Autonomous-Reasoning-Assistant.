@@ -194,16 +194,29 @@ def _get_emotion(zara) -> str:
 
 def detect_task_type(text: str) -> str:
     text_lower = text.lower()
-    code_keywords = ["code", "write", "function", "class", "def ", "import ", "bug", "error", "compile", "script"]
-    system_keywords = ["system", "cpu", "ram", "memory", "disk", "process", "kill", "usage", "temperature"]
-    vision_keywords = ["see", "look", "camera", "screen", "what is this", "describe", "identify"]
     
-    if any(k in text_lower for k in code_keywords):
+    # Strong signals (exact phrases)
+    if any(p in text_lower for p in ["write a function", "python script", "code for me", "debug this", "write code"]):
         return "code"
-    if any(k in text_lower for k in system_keywords):
+    if any(p in text_lower for p in ["cpu usage", "ram usage", "system stats", "how hot is my gpu", "show system"]):
         return "system"
-    if any(k in text_lower for k in vision_keywords):
+    if any(p in text_lower for p in ["what do you see", "look at my screen", "camera on", "identify this", "describe image"]):
         return "vision"
+    
+    # Weak signals (single words) — require at least 2 match score
+    code_words = ["function", "class", "def ", "import ", "bug", "compile", "syntax"]
+    system_words = ["cpu", "ram", "memory", "disk", "process", "temperature"]
+    vision_words = ["camera", "screen", "describe image", "snapshot"]
+    
+    code_score = sum(1 for w in code_words if w in text_lower)
+    system_score = sum(1 for w in system_words if w in text_lower)
+    vision_score = sum(1 for w in vision_words if w in text_lower)
+    
+    scores = {"code": code_score, "system": system_score, "vision": vision_score}
+    best = max(scores, key=scores.get)
+    
+    if scores[best] >= 2:
+        return best
     return "chat"
 
 

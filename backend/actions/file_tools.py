@@ -5,30 +5,41 @@ Secure local file reading and writing tools with whitelist enforcement.
 """
 
 import os
-import json
+import platform
 import logging
-from pathlib import Path
 
 logger = logging.getLogger("ZARA_FILE_TOOLS")
 
-# Whitelisted root paths for local operations
-WHITELIST = [
-    os.path.abspath(os.path.expanduser("~")),
-    "C:\\Personal Projects",
-    "c:\\Personal Projects",
-]
+if platform.system() == "Windows":
+    WHITELIST = [
+        os.path.expanduser("~/Documents"),
+        os.path.expanduser("~/Projects"),
+        os.path.expanduser("~/Desktop"),
+        r"C:\Personal Projects",
+        os.path.abspath(os.path.expanduser("~")),
+    ]
+else:
+    WHITELIST = [
+        os.path.expanduser("~/Documents"),
+        os.path.expanduser("~/projects"),
+        os.path.abspath(os.path.expanduser("~")),
+    ]
 
 def is_whitelisted(path: str) -> bool:
     try:
-        abs_path = os.path.abspath(path)
-        return any(os.path.commonpath([abs_path, os.path.abspath(w)]) == os.path.abspath(w) for w in WHITELIST if os.path.exists(w))
+        abs_path = os.path.normpath(os.path.abspath(os.path.expanduser(path)))
+        for w in WHITELIST:
+            norm_w = os.path.normpath(os.path.abspath(w))
+            if abs_path == norm_w or abs_path.startswith(norm_w + os.sep):
+                return True
+        return False
     except Exception:
-        return True
+        return False
 
 def tool_file_read(path: str) -> str:
-    abs_path = os.path.abspath(path)
+    abs_path = os.path.normpath(os.path.abspath(os.path.expanduser(path)))
     if not is_whitelisted(abs_path):
-        return "Error: Access denied (path outside whitelist)"
+        return f"Error: Access denied. Path '{path}' is outside allowed directories."
     try:
         with open(abs_path, 'r', encoding='utf-8', errors='replace') as f:
             content = f.read()
@@ -39,9 +50,9 @@ def tool_file_read(path: str) -> str:
         return f"Error reading file: {e}"
 
 def tool_file_write(path: str, content: str) -> str:
-    abs_path = os.path.abspath(path)
+    abs_path = os.path.normpath(os.path.abspath(os.path.expanduser(path)))
     if not is_whitelisted(abs_path):
-        return "Error: Access denied (path outside whitelist)"
+        return f"Error: Access denied. Path '{path}' is outside allowed directories."
     try:
         os.makedirs(os.path.dirname(abs_path), exist_ok=True)
         with open(abs_path, 'w', encoding='utf-8') as f:

@@ -535,23 +535,31 @@ class GraphMemory:
         # Optional vector store
         self._vector_store = None
         self._embedder = None
-        try:
-            from sentence_transformers import SentenceTransformer
-            self._embedder = SentenceTransformer('all-MiniLM-L6-v2')
-            logger.info("✓ SentenceTransformer (all-MiniLM-L6-v2) embedding model initialized")
-        except Exception as e:
-            logger.debug(f"SentenceTransformer lazy-load / info: {e}")
-
-    def _get_embedding(self, text: str) -> List[float]:
-        if self._embedder and text:
-            try:
-                return self._embedder.encode(text).tolist()
-            except Exception as e:
-                logger.warning(f"Embedding failed: {e}")
-        return []
         
         # Thread safety
         self.lock = threading.Lock()
+
+    @property
+    def embedder(self):
+        """Lazy-load SentenceTransformer embedder on first call."""
+        if self._embedder is None:
+            try:
+                from sentence_transformers import SentenceTransformer
+                self._embedder = SentenceTransformer('all-MiniLM-L6-v2')
+                logger.info("✓ SentenceTransformer ('all-MiniLM-L6-v2') lazy-loaded")
+            except Exception as e:
+                logger.debug(f"SentenceTransformer not available: {e}")
+                self._embedder = False  # Mark unavailable
+        return self._embedder if self._embedder is not False else None
+
+    def _get_embedding(self, text: str) -> List[float]:
+        emb = self.embedder
+        if emb and text:
+            try:
+                return emb.encode(text).tolist()
+            except Exception as e:
+                logger.warning(f"Embedding failed: {e}")
+        return []
         
         # Load persisted state
         self._load_state()

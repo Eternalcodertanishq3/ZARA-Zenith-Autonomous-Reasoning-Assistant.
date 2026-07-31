@@ -22,10 +22,10 @@ function tauriInvoke(cmd: string, args?: Record<string, unknown>): void {
 // ═══════════════════════════════════════════════════════════════
 
 const TASK_SIZES: Record<string, { width: number; height: number }> = {
-  chat:    { width: 480, height: 220 },
-  code:    { width: 820, height: 460 },
-  system:  { width: 440, height: 340 },
-  vision:  { width: 600, height: 160 },
+  chat:    { width: 520, height: 280 },
+  code:    { width: 860, height: 520 },
+  system:  { width: 480, height: 400 },
+  vision:  { width: 640, height: 220 },
 };
 
 // ═══════════════════════════════════════════════════════════════
@@ -88,7 +88,6 @@ function morphTo(task: string): void {
 
 function updateLayout(task: string): void {
   const isExpanded = task !== 'idle' && task !== 'thinking';
-
   taskLabel.textContent = task === 'idle' ? 'ZARA' : task.toUpperCase();
 
   const layouts = document.querySelectorAll('.layout');
@@ -106,30 +105,7 @@ function updateLayout(task: string): void {
 }
 
 // ═══════════════════════════════════════════════════════════════
-//  Click outside pill → close to orb
-// ═══════════════════════════════════════════════════════════════
-
-canvas.addEventListener('click', (e: MouseEvent) => {
-  if (currentTask === 'idle') return;
-
-  // Check if click is outside the glass panel region
-  const rect = canvas.getBoundingClientRect();
-  const dpr = window.devicePixelRatio || 1;
-  const x = (e.clientX - rect.left) * dpr;
-  const y = (e.clientY - rect.top) * dpr;
-  const cx = canvas.width * 0.5;
-  const cy = canvas.height * 0.5;
-  const size = TASK_SIZES[currentTask] || TASK_SIZES.chat;
-  const halfW = size.width * dpr * 0.5;
-  const halfH = size.height * dpr * 0.5;
-
-  if (Math.abs(x - cx) > halfW || Math.abs(y - cy) > halfH) {
-    morphTo('idle');
-  }
-});
-
-// ═══════════════════════════════════════════════════════════════
-//  Press & drag interaction with strict orb hit-testing
+//  Press & drag interaction with strict hit-testing & click-outside close
 // ═══════════════════════════════════════════════════════════════
 
 function getOrbHit(e: MouseEvent): { dist: number; isInside: boolean } {
@@ -141,7 +117,7 @@ function getOrbHit(e: MouseEvent): { dist: number; isInside: boolean } {
   const dx = clickX - centerX;
   const dy = clickY - centerY;
   const dist = Math.hypot(dx, dy);
-  const hitRadius = currentTask === 'idle' ? 68 : 100;
+  const hitRadius = currentTask === 'idle' ? 68 : 120;
   return { dist, isInside: dist <= hitRadius };
 }
 
@@ -149,25 +125,29 @@ let isPressed = false;
 let pressStartTime = 0;
 let pressTimeout: ReturnType<typeof setTimeout> | null = null;
 
+// Global listener: Click outside interactive elements in pill state -> morph back to orb
+window.addEventListener('pointerdown', (e: PointerEvent) => {
+  if (currentTask === 'idle') return;
+
+  const target = e.target as HTMLElement;
+  const isInteractive = target.closest('input') ||
+                        target.closest('textarea') ||
+                        target.closest('button') ||
+                        target.closest('.tab') ||
+                        target.closest('.file-item') ||
+                        target.closest('.chat-messages') ||
+                        target.closest('.sys-card');
+
+  if (!isInteractive) {
+    morphTo('idle');
+  }
+});
+
 canvas.addEventListener('pointerdown', (e: PointerEvent) => {
   const { isInside } = getOrbHit(e);
 
   if (currentTask === 'idle') {
     if (!isInside) return;
-  } else {
-    // In expanded pill mode, check if click is outside interactive elements/pill bounds
-    const target = e.target as HTMLElement;
-    const isInteractive = target.closest('.chat-input') || target.closest('.tab') || target.closest('.win-btn') || target.closest('.file-item');
-
-    const rect = canvas.getBoundingClientRect();
-    const dx = e.clientX - rect.left - rect.width / 2;
-    const dy = e.clientY - rect.top - rect.height / 2;
-    const size = TASK_SIZES[currentTask] || TASK_SIZES.chat;
-
-    if (!isInteractive && (Math.abs(dx) > size.width / 2 || Math.abs(dy) > size.height / 2)) {
-      morphTo('idle');
-      return;
-    }
   }
 
   isPressed = true;
@@ -197,7 +177,7 @@ canvas.addEventListener('pointerup', (e: PointerEvent) => {
     canvas.releasePointerCapture(e.pointerId);
   } catch {}
 
-  canvas.style.cursor = isInside && currentTask === 'idle' ? 'grab' : 'default';
+  canvas.style.cursor = 'default';
 
   if (pressTimeout) {
     clearTimeout(pressTimeout);
@@ -214,16 +194,10 @@ canvas.addEventListener('pointerup', (e: PointerEvent) => {
   }
 });
 
-canvas.addEventListener('pointermove', (e: PointerEvent) => {
-  const { isInside } = getOrbHit(e);
+canvas.addEventListener('pointermove', (_e: PointerEvent) => {
+  canvas.style.cursor = isPressed ? 'grabbing' : 'default';
 
-  if (currentTask === 'idle') {
-    canvas.style.cursor = isInside ? (isPressed ? 'grabbing' : 'grab') : 'default';
-  } else {
-    canvas.style.cursor = 'default';
-  }
-
-  if (isPressed && currentTask === 'idle') {
+  if (isPressed) {
     tauriInvoke('start_drag');
   }
 });

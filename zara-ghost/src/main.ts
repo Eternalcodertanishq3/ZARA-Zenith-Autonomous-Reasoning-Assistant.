@@ -172,6 +172,9 @@ idleCore.addEventListener('click', () => morphTo('chat'));
 (window as any).minimize = minimize;
 (window as any).closeWindow = closeWindow;
 
+// Initial position & state sync
+morphTo('idle');
+
 // System stats polling mockup
 setInterval(() => {
   if (currentTask === 'system') {

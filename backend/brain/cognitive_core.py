@@ -395,10 +395,12 @@ class ConsciousMind:
 
     def _get_current_mood(self) -> str:
         """Get current emotional state."""
-        if self.soul:
-            return self.soul.current_mood.value
-        elif self.emotion:
-            return self.emotion.current_mood
+        if self.soul and hasattr(self.soul, 'current_mood'):
+            mood = self.soul.current_mood
+            return mood.value if hasattr(mood, 'value') else str(mood)
+        elif self.emotion and hasattr(self.emotion, 'current_mood'):
+            mood = self.emotion.current_mood
+            return mood.value if hasattr(mood, 'value') else str(mood)
         return "neutral"
 
     # ═══════════════════════════════════════════════════════════════════

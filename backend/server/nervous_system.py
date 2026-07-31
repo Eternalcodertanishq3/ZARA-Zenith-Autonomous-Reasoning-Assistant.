@@ -403,8 +403,9 @@ def build_app(zara) -> FastAPI:
                         "audio_b64": None,
                     })
 
-                    # Schedule speaking=False proportional to text length
-                    speak_delay = max(1.5, len(reply) * 0.042)
+                    # Schedule speaking=False proportional to word count
+                    word_count = len(reply.split())
+                    speak_delay = max(1.5, min(12.0, word_count * 0.35))
                     async def _done_speaking(delay: float, emo: str) -> None:
                         await asyncio.sleep(delay)
                         await manager.broadcast({

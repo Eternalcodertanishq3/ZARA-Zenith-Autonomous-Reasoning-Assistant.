@@ -184,14 +184,16 @@ def isolated_audio_worker(audio_queue: Queue, stop_event: Event):
     try:
         from ears.stt_engine import HearingSystem
         ears = HearingSystem()
-        # Initialize successfully
         audio_queue.put({"status": "ready"})
         
-        for text in ears.process_audio_stream():
-            if stop_event.is_set():
-                break
-            if text and text.strip():
-                audio_queue.put({"type": "text", "content": text})
+        try:
+            for text in ears.process_audio_stream():
+                if stop_event.is_set():
+                    break
+                if text and text.strip():
+                    audio_queue.put({"type": "text", "content": text})
+        except Exception as e:
+            audio_queue.put({"status": "error", "error": f"Audio stream processing error: {e}"})
                 
     except Exception as e:
         audio_queue.put({"status": "error", "error": str(e)})
@@ -711,22 +713,31 @@ class ZaraConsciousness:
         
         # Stop all services safely
         logger.info("Stopping background services...")
-        _safe_stop("heartbeat", self.heartbeat.stop)
-        _safe_stop("energy", self.energy.stop_monitoring)
-        _safe_stop("resources", self.resources.stop)
+        if hasattr(self, 'heartbeat') and self.heartbeat:
+            _safe_stop("heartbeat", self.heartbeat.stop)
+        if hasattr(self, 'energy') and self.energy:
+            _safe_stop("energy", self.energy.stop_monitoring)
+        if hasattr(self, 'resources') and self.resources:
+            _safe_stop("resources", self.resources.stop)
         if hasattr(self, 'firewall') and self.firewall:
             _safe_stop("firewall", self.firewall.stop_monitoring)
-        _safe_stop("boredom", self.boredom.stop)
-        _safe_stop("dreams", self.dreams.stop)
+        if hasattr(self, 'boredom') and self.boredom:
+            _safe_stop("boredom", self.boredom.stop)
+        if hasattr(self, 'dreams') and self.dreams:
+            _safe_stop("dreams", self.dreams.stop)
         
         # ═══════════════════════════════════════════════════════════
         # Stop Phase 9-12 Consciousness Systems
         # ═══════════════════════════════════════════════════════════
         logger.info("Stopping consciousness systems...")
-        _safe_stop("neurochemistry", self.neurochemistry.stop)
-        _safe_stop("motivation", self.motivation.stop)
-        _safe_stop("metacognition", self.metacognition.stop)
-        _safe_stop("hand_spawner", self.hand_spawner.stop)
+        if hasattr(self, 'neurochemistry') and self.neurochemistry:
+            _safe_stop("neurochemistry", self.neurochemistry.stop)
+        if hasattr(self, 'motivation') and self.motivation:
+            _safe_stop("motivation", self.motivation.stop)
+        if hasattr(self, 'metacognition') and self.metacognition:
+            _safe_stop("metacognition", self.metacognition.stop)
+        if hasattr(self, 'hand_spawner') and self.hand_spawner:
+            _safe_stop("hand_spawner", self.hand_spawner.stop)
         
         # Farewell message (also wrapped for safety)
         try:

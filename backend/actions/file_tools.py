@@ -10,20 +10,15 @@ import logging
 
 logger = logging.getLogger("ZARA_FILE_TOOLS")
 
-if platform.system() == "Windows":
-    WHITELIST = [
-        os.path.expanduser("~/Documents"),
-        os.path.expanduser("~/Projects"),
-        os.path.expanduser("~/Desktop"),
-        r"C:\Personal Projects",
-        os.path.abspath(os.path.expanduser("~")),
-    ]
-else:
-    WHITELIST = [
-        os.path.expanduser("~/Documents"),
-        os.path.expanduser("~/projects"),
-        os.path.abspath(os.path.expanduser("~")),
-    ]
+CUSTOM_PATHS = [p.strip() for p in os.environ.get("ZARA_WHITELIST", "").split(";") if p.strip()]
+
+WHITELIST = [
+    os.path.expanduser("~/Documents"),
+    os.path.expanduser("~/Projects"),
+    os.path.expanduser("~/projects"),
+    os.path.expanduser("~/Desktop"),
+    os.path.abspath(os.path.expanduser("~")),
+] + [os.path.abspath(p) for p in CUSTOM_PATHS]
 
 def is_whitelisted(path: str) -> bool:
     try:

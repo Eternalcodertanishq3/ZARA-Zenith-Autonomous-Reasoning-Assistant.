@@ -129,7 +129,7 @@ canvas.addEventListener('click', (e: MouseEvent) => {
 });
 
 // ═══════════════════════════════════════════════════════════════
-//  Press & drag interaction with strict orb hit-testing & pass-through
+//  Press & drag interaction with strict orb hit-testing
 // ═══════════════════════════════════════════════════════════════
 
 function getOrbHit(e: MouseEvent): { dist: number; isInside: boolean } {
@@ -141,20 +141,19 @@ function getOrbHit(e: MouseEvent): { dist: number; isInside: boolean } {
   const dx = clickX - centerX;
   const dy = clickY - centerY;
   const dist = Math.hypot(dx, dy);
-  const hitRadius = currentTask === 'idle' ? 64 : 100;
+  const hitRadius = currentTask === 'idle' ? 68 : 100;
   return { dist, isInside: dist <= hitRadius };
 }
 
 let isPressed = false;
 let pressStartTime = 0;
 let pressTimeout: ReturnType<typeof setTimeout> | null = null;
-let isIgnoringCursor = false;
 
 canvas.addEventListener('pointerdown', (e: PointerEvent) => {
   const { isInside } = getOrbHit(e);
 
   if (currentTask === 'idle') {
-    if (!isInside) return;
+    if (!isInside) return; // Discard completely if pointer is outside orb!
   } else {
     const rect = canvas.getBoundingClientRect();
     const dx = e.clientX - rect.left - rect.width / 2;
@@ -168,7 +167,9 @@ canvas.addEventListener('pointerdown', (e: PointerEvent) => {
   isPressed = true;
   pressStartTime = performance.now();
   siriState.setPressed(true);
-  canvas.setPointerCapture(e.pointerId);
+  try {
+    canvas.setPointerCapture(e.pointerId);
+  } catch {}
   canvas.style.cursor = 'grabbing';
 
   if (currentTask === 'idle') {
@@ -182,11 +183,14 @@ canvas.addEventListener('pointerdown', (e: PointerEvent) => {
 
 canvas.addEventListener('pointerup', (e: PointerEvent) => {
   const pressDuration = performance.now() - pressStartTime;
+  const { isInside } = getOrbHit(e);
+
   isPressed = false;
   siriState.setPressed(false);
-  canvas.releasePointerCapture(e.pointerId);
+  try {
+    canvas.releasePointerCapture(e.pointerId);
+  } catch {}
 
-  const { isInside } = getOrbHit(e);
   canvas.style.cursor = isInside && currentTask === 'idle' ? 'grab' : 'default';
 
   if (pressTimeout) {
@@ -199,7 +203,7 @@ canvas.addEventListener('pointerup', (e: PointerEvent) => {
     return;
   }
 
-  if (pressDuration < 300 && currentTask === 'idle' && isInside) {
+  if (pressDuration < 350 && currentTask === 'idle' && isInside) {
     morphTo('chat');
   }
 });
@@ -208,19 +212,7 @@ canvas.addEventListener('pointermove', (e: PointerEvent) => {
   const { isInside } = getOrbHit(e);
 
   if (currentTask === 'idle') {
-    if (isInside) {
-      canvas.style.cursor = isPressed ? 'grabbing' : 'grab';
-      if (isIgnoringCursor) {
-        isIgnoringCursor = false;
-        tauriInvoke('set_ignore_cursor', { ignore: false });
-      }
-    } else {
-      canvas.style.cursor = 'default';
-      if (!isIgnoringCursor && !isPressed) {
-        isIgnoringCursor = true;
-        tauriInvoke('set_ignore_cursor', { ignore: true });
-      }
-    }
+    canvas.style.cursor = isInside ? (isPressed ? 'grabbing' : 'grab') : 'default';
   } else {
     canvas.style.cursor = 'default';
   }

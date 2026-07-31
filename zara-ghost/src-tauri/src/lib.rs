@@ -34,11 +34,6 @@ fn start_drag(window: WebviewWindow) {
     let _ = window.start_dragging();
 }
 
-#[tauri::command]
-fn set_ignore_cursor(window: WebviewWindow, ignore: bool) {
-    let _ = window.set_ignore_cursor_events(ignore);
-}
-
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
@@ -49,7 +44,7 @@ pub fn run() {
             }
             Ok(())
         })
-        .invoke_handler(tauri::generate_handler![morph_window, start_drag, set_ignore_cursor])
+        .invoke_handler(tauri::generate_handler![morph_window, start_drag])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

@@ -66,20 +66,7 @@ html, body {
   display: flex;
   align-items: center;
   gap: 8px;
-}
-
-.status-dot {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: radial-gradient(circle at 30% 30%, #38bdf8, #818cf8);
-  box-shadow: 0 0 10px rgba(56, 189, 248, 0.8), 0 0 20px rgba(129, 140, 248, 0.5);
-  animation: miniOrbPulse 2.5s infinite ease-in-out;
-}
-
-@keyframes miniOrbPulse {
-  0%, 100% { transform: scale(1); opacity: 0.9; }
-  50% { transform: scale(1.15); opacity: 1; box-shadow: 0 0 14px rgba(56, 189, 248, 1), 0 0 25px rgba(129, 140, 248, 0.8); }
+  padding-left: 32px;
 }
 
 #task-label {

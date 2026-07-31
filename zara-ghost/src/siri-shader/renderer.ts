@@ -287,23 +287,34 @@ export class SiriRenderer {
   private _layout(surface: SiriSurface, sizes: SiriSizes): RenderLayout {
     const pressScale = 1 + surface.press * 0.018;
     const margin = PANEL_MARGIN_PX * this.dpr;
-    const answer = surface.answer || 0;
+    const answer = Math.min(1, Math.max(0, surface.answer || 0));
+
     const baseSize = sizes.expanded.width * this.dpr;
     const answerWidth = Math.min(sizes.answer.width * this.dpr, this.width - 48 * this.dpr);
     const answerHeight = sizes.answer.height * this.dpr;
+
     const coreWidth = (baseSize + (answerWidth - baseSize) * answer) * pressScale;
     const coreHeight = (baseSize + (answerHeight - baseSize) * answer) * pressScale;
     const panelWidth = coreWidth + margin * 2;
     const panelHeight = coreHeight + margin * 2;
-    const effectWidth = Math.max(1, Math.round(coreWidth * EFFECT_OVERDRAW));
-    const effectHeight = Math.max(1, Math.round(coreHeight * EFFECT_OVERDRAW));
+
     const panelX = (this.width - panelWidth) * 0.5 + this.panelOffset[0];
     const panelY = (this.height - panelHeight) * 0.5 + this.panelOffset[1];
-    const panelCenterY = panelY + panelHeight * 0.5;
+
+    // WebGL Orb shrinks from 128px center orb to 48px mini orb inside header
+    const orbTargetSize = 48 * this.dpr;
+    const orbCoreSize = (baseSize + (orbTargetSize - baseSize) * answer) * pressScale;
+    const effectWidth = Math.max(1, Math.round(orbCoreSize * EFFECT_OVERDRAW));
+    const effectHeight = Math.max(1, Math.round(orbCoreSize * EFFECT_OVERDRAW));
+
+    // Orb center glides from canvas center to top-left header of expanded glass panel
+    const orbCenterX = panelX + margin + (coreWidth * 0.5) + (24 * this.dpr - coreWidth * 0.5) * answer;
+    const orbCenterY = panelY + margin + (coreHeight * 0.5) + (24 * this.dpr - coreHeight * 0.5) * answer;
+
     return {
       effectWidth,
       effectHeight,
-      effectOrigin: [(this.width - effectWidth) * 0.5 + this.panelOffset[0], panelCenterY - effectHeight * 0.5],
+      effectOrigin: [orbCenterX - effectWidth * 0.5, orbCenterY - effectHeight * 0.5],
       effectSize: [effectWidth, effectHeight],
       panelOrigin: [panelX, panelY],
       panelSize: [panelWidth, panelHeight],

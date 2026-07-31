@@ -1,0 +1,5 @@
+# Authorized Faces & Local Biometric Data
+*.jpg
+*.jpeg
+*.png
+*.pkl

@@ -114,33 +114,10 @@ class ConsciousMind:
         self._load_brain()
 
     def _init_subsystems(self):
-        """Initialize all cognitive subsystems."""
-        # Consciousness (Self-Learning)
-        try:
-            from evolution.ssl_trainer import get_consciousness
-            self.consciousness = get_consciousness()
-            logger.info("Consciousness module connected.")
-        except Exception as e:
-            logger.warning(f"Consciousness not available: {e}")
-            self.consciousness = None
-        
-        # Knowledge System
-        try:
-            from evolution.knowledge_ingest import AutonomousKnowledgeSystem
-            self.knowledge = AutonomousKnowledgeSystem()
-            logger.info("Knowledge system connected.")
-        except Exception as e:
-            logger.warning(f"Knowledge system not available: {e}")
-            self.knowledge = None
-        
-        # Personality/Soul
-        try:
-            from evolution.contextual_adapter import get_soul
-            self.soul = get_soul()
-            logger.info("Soul module connected.")
-        except Exception as e:
-            logger.warning(f"Soul not available: {e}")
-            self.soul = None
+        """Initialize cognitive subsystems."""
+        self.consciousness = None
+        self.knowledge = None
+        self.soul = None
         
         # Emotional Anchor
         try:

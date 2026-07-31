@@ -764,15 +764,7 @@ class ZaraConsciousness:
         # Phase 9-12: Consciousness Processing (Commented Out for Speed)
         # ═══════════════════════════════════════════════════════════
         
-        # Process through neurochemistry (user interaction stimulus)
-        if hasattr(self, 'neurochemistry') and self.neurochemistry:
-            self.neurochemistry.process_stimulus(Stimulus(
-                type=StimulusType.USER_INTERACTION,
-                intensity=0.6,
-                context={"input": user_input[:100]}
-            ))
-        
-        # Broadcast to consciousness via metacognition
+        # Optional perception broadcast
         if hasattr(self, 'metacognition') and self.metacognition:
             self.metacognition.broadcast_perception(user_input, source="ears")
         
@@ -878,8 +870,9 @@ class ZaraConsciousness:
             f"[EMOTION] User seems: {detected_emotion}"
         ]))
         
-        # Start latency handling
-        self.latency.start_thinking()
+        # Start latency handling (if available)
+        if hasattr(self, 'latency') and self.latency:
+            self.latency.start_thinking()
         
         try:
             full_response = ""
@@ -888,7 +881,8 @@ class ZaraConsciousness:
             for token in self.brain.think(user_input, extra_context=full_context):
                 full_response += token
             
-            self.latency.stop_thinking()
+            if hasattr(self, 'latency') and self.latency:
+                self.latency.stop_thinking()
             
             # ═══════════════════════════════════════════════════════
             # Step 4: Learn & Remember
@@ -940,7 +934,8 @@ class ZaraConsciousness:
             return full_response
             
         except Exception as e:
-            self.latency.stop_thinking()
+            if hasattr(self, 'latency') and self.latency:
+                self.latency.stop_thinking()
             logger.error(f"Processing error: {e}")
             return "Sorry, I encountered an error processing that. Let me try again?"
 

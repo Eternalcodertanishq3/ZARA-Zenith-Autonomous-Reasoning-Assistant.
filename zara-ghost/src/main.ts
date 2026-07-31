@@ -133,14 +133,40 @@ canvas.addEventListener('click', (e: MouseEvent) => {
 });
 
 // ═══════════════════════════════════════════════════════════════
-//  Press & hold reaction
+//  Desktop Screen Capture Integration for Real Refraction
 // ═══════════════════════════════════════════════════════════════
 
-let isPressed = false;
-let pressStartTime = 0;
-let pressTimeout: ReturnType<typeof setTimeout> | null = null;
+let isCapturingDesktop = false;
+async function captureDesktopBackground(): Promise<void> {
+  if (isCapturingDesktop || !renderer) return;
+  isCapturingDesktop = true;
+  try {
+    const rawBytes = await window.__TAURI__?.core?.invoke('capture_desktop') as number[];
+    if (rawBytes && renderer && rawBytes.length > 0) {
+      const w = canvas.width;
+      const h = canvas.height;
+      const imageData = new ImageData(new Uint8ClampedArray(rawBytes), w, h);
+      renderer.setBackgroundData(imageData);
+    }
+  } catch {
+  } finally {
+    isCapturingDesktop = false;
+  }
+}
 
-canvas.addEventListener('pointerdown', (e: PointerEvent) => {
+// Initial capture after window position settles
+setTimeout(captureDesktopBackground, 150);
+setInterval(() => {
+  if (currentTask === 'idle') {
+    captureDesktopBackground();
+  }
+}, 1000);
+
+// ═══════════════════════════════════════════════════════════════
+//  Press & drag interaction with strict orb hit-testing
+// ═══════════════════════════════════════════════════════════════
+
+function getOrbHit(e: MouseEvent): { dist: number; isInside: boolean } {
   const rect = canvas.getBoundingClientRect();
   const clickX = e.clientX - rect.left;
   const clickY = e.clientY - rect.top;
@@ -149,14 +175,23 @@ canvas.addEventListener('pointerdown', (e: PointerEvent) => {
   const dx = clickX - centerX;
   const dy = clickY - centerY;
   const dist = Math.hypot(dx, dy);
+  const hitRadius = currentTask === 'idle' ? 68 : 100;
+  return { dist, isInside: dist <= hitRadius };
+}
+
+let isPressed = false;
+let pressStartTime = 0;
+let pressTimeout: ReturnType<typeof setTimeout> | null = null;
+
+canvas.addEventListener('pointerdown', (e: PointerEvent) => {
+  const { isInside } = getOrbHit(e);
 
   if (currentTask === 'idle') {
-    // Orb diameter is 128px (radius 64px). Allow max 74px hit radius.
-    if (dist > 74) {
-      return;
-    }
+    if (!isInside) return; // Ignore completely if pointer is outside the orb!
   } else {
-    // In expanded mode, check if click is inside pill bounds
+    const rect = canvas.getBoundingClientRect();
+    const dx = e.clientX - rect.left - rect.width / 2;
+    const dy = e.clientY - rect.top - rect.height / 2;
     const size = TASK_SIZES[currentTask] || TASK_SIZES.chat;
     if (Math.abs(dx) > size.width / 2 || Math.abs(dy) > size.height / 2) {
       return;
@@ -167,8 +202,8 @@ canvas.addEventListener('pointerdown', (e: PointerEvent) => {
   pressStartTime = performance.now();
   siriState.setPressed(true);
   canvas.setPointerCapture(e.pointerId);
+  canvas.style.cursor = 'grabbing';
 
-  // Long press → listening state after 500ms
   if (currentTask === 'idle') {
     pressTimeout = setTimeout(() => {
       if (isPressed) {
@@ -184,27 +219,36 @@ canvas.addEventListener('pointerup', (e: PointerEvent) => {
   siriState.setPressed(false);
   canvas.releasePointerCapture(e.pointerId);
 
+  const { isInside } = getOrbHit(e);
+  canvas.style.cursor = isInside && currentTask === 'idle' ? 'grab' : 'default';
+
   if (pressTimeout) {
     clearTimeout(pressTimeout);
     pressTimeout = null;
   }
 
-  // If was listening (long press), go back to idle
   if (siriState.state === 'listening') {
     siriState.select('idle');
     return;
   }
 
-  // Short click on idle → open chat
-  if (pressDuration < 300 && currentTask === 'idle') {
+  if (pressDuration < 300 && currentTask === 'idle' && isInside) {
     morphTo('chat');
   }
 });
 
-canvas.addEventListener('pointermove', (_e: PointerEvent) => {
-  if (!isPressed) return;
+canvas.addEventListener('pointermove', (e: PointerEvent) => {
+  const { isInside } = getOrbHit(e);
+
   if (currentTask === 'idle') {
+    canvas.style.cursor = isInside ? (isPressed ? 'grabbing' : 'grab') : 'default';
+  } else {
+    canvas.style.cursor = 'default';
+  }
+
+  if (isPressed && currentTask === 'idle') {
     tauriInvoke('start_drag');
+    captureDesktopBackground();
   }
 });
 

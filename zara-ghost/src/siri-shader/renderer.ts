@@ -270,6 +270,16 @@ export class SiriRenderer {
     this.backgroundReady = 1;
   }
 
+  public setBackgroundData(imageData: ImageData): void {
+    const gl = this.gl;
+    if (!gl || !this.backgroundTexture) return;
+    gl.bindTexture(gl.TEXTURE_2D, this.backgroundTexture);
+    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 0);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, imageData.width, imageData.height, 0, gl.RGBA, gl.UNSIGNED_BYTE, imageData.data);
+    this.backgroundSize = [imageData.width, imageData.height];
+    this.backgroundReady = 1;
+  }
+
   public render(params: RenderParams): void {
     if (!this.gl || this.disposed || this.error) return;
     const { surface, progress, bands, sizes, dt = 0 } = params;

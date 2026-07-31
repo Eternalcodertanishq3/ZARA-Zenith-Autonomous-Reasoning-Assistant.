@@ -17,11 +17,7 @@ html, body {
   width: 100%;
   height: 100%;
   display: block;
-  cursor: grab;
-}
-
-#siri-canvas:active {
-  cursor: grabbing;
+  cursor: default;
 }
 
 #pill-overlay {

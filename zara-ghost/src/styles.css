@@ -33,15 +33,37 @@ html, body {
 
 /* Only add glass background when NOT idle */
 #zara-container:not([data-task="idle"]) {
-  background: rgba(8, 12, 24, 0.72);
-  backdrop-filter: blur(28px) saturate(1.3);
-  -webkit-backdrop-filter: blur(28px) saturate(1.3);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(8, 12, 24, 0.78);
+  backdrop-filter: blur(28px) saturate(1.4);
+  -webkit-backdrop-filter: blur(28px) saturate(1.4);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   box-shadow: 
-    0 12px 48px rgba(0, 0, 0, 0.5),
-    inset 0 1px 0 rgba(255, 255, 255, 0.06);
-  border-radius: 18px;
+    0 16px 50px rgba(0, 0, 0, 0.6),
+    0 0 30px rgba(34, 211, 238, 0.15),
+    0 0 50px rgba(225, 29, 72, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  border-radius: 20px;
   overflow: hidden;
+  position: relative;
+}
+
+/* Liquid Iridescent Top Edge Highlight */
+#zara-container:not([data-task="idle"])::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    rgba(34, 211, 238, 0.8),
+    rgba(225, 29, 72, 0.8),
+    rgba(168, 85, 247, 0.8),
+    rgba(34, 211, 238, 0.8)
+  );
+  z-index: 100;
+  pointer-events: none;
 }
 
 /* ═════════════════════════════════════════════════════════════

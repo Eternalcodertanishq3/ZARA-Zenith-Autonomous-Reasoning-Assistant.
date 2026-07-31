@@ -1,0 +1,16 @@
+[
+  {
+    "id": "6907e4fd660a88aa",
+    "content": "User: Hello ZARA!\nZara: ZARA: Hello to you too! I'm happy to assist in any way I can. What would you like to talk about today?",
+    "memory_type": "conversation",
+    "timestamp": "2026-07-31T16:55:06.728612",
+    "emotional_weight": 0.5,
+    "source": "conversation",
+    "metadata": {
+      "emotion": "neutral",
+      "user_text_preview": "Hello ZARA!"
+    },
+    "access_count": 0,
+    "last_accessed": "2026-07-31T16:55:06.728612"
+  }
+]

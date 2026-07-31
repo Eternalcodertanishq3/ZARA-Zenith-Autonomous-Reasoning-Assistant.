@@ -172,11 +172,51 @@ idleCore.addEventListener('click', () => morphTo('chat'));
 (window as any).minimize = minimize;
 (window as any).closeWindow = closeWindow;
 
+function drawOrbitRings(
+  ctx: CanvasRenderingContext2D,
+  cx: number,
+  cy: number,
+  r: number,
+  time: number,
+  isBack: boolean
+) {
+  const numRings = 3;
+  for (let i = 0; i < numRings; i++) {
+    const rx = r * 1.35;
+    const ry = r * 0.38 + Math.sin(time + i) * 6;
+    const rot = -0.3 + i * 0.3;
+
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.rotate(rot);
+
+    // Split 3D orbit into back arc and front arc
+    const startAngle = isBack ? Math.PI : 0;
+    const endAngle = isBack ? Math.PI * 2 : Math.PI;
+
+    ctx.beginPath();
+    ctx.ellipse(0, 0, rx, ry, 0, startAngle, endAngle);
+    ctx.lineWidth = 2.5 - i * 0.5;
+
+    const colors = [
+      'rgba(56, 189, 248, 0.85)', // Cyan
+      'rgba(192, 132, 252, 0.75)', // Purple
+      'rgba(244, 63, 94, 0.7)',   // Rose
+    ];
+    ctx.strokeStyle = colors[i % colors.length];
+    ctx.stroke();
+    ctx.restore();
+  }
+}
+
 function initSiriCanvas() {
   const canvas = document.getElementById('siri-canvas') as HTMLCanvasElement;
   if (!canvas) return;
   const ctx = canvas.getContext('2d');
   if (!ctx) return;
+
+  canvas.width = 300;
+  canvas.height = 300;
 
   let time = 0;
 
@@ -187,91 +227,97 @@ function initSiriCanvas() {
     const h = canvas.height;
     const cx = w / 2;
     const cy = h / 2;
-    const r = 88;
+    const r = 92;
 
     ctx.clearRect(0, 0, w, h);
 
-    // 1. Clip outer sphere boundary
+    // 1. Draw 3D Orbiting Back Rings (behind sphere)
+    drawOrbitRings(ctx, cx, cy, r, time, true);
+
+    // 2. Clip Outer Glass Sphere
     ctx.save();
     ctx.beginPath();
     ctx.arc(cx, cy, r, 0, Math.PI * 2);
     ctx.clip();
 
-    // Dark obsidian sphere background
+    // Dark Obsidian Sphere Base
     const bgGrad = ctx.createRadialGradient(cx, cy, 0, cx, cy, r);
-    bgGrad.addColorStop(0, '#0a0d1a');
-    bgGrad.addColorStop(0.7, '#050711');
-    bgGrad.addColorStop(1, '#020308');
+    bgGrad.addColorStop(0, '#0c0f24');
+    bgGrad.addColorStop(0.65, '#060814');
+    bgGrad.addColorStop(1, '#020309');
     ctx.fillStyle = bgGrad;
     ctx.fillRect(0, 0, w, h);
 
     ctx.globalCompositeOperation = 'screen';
 
-    // Blob 1: Vibrant Cyan (Image 2)
-    const cX = cx + Math.sin(time * 1.1) * 22;
-    const cY = cy + Math.cos(time * 0.9) * 20 - 10;
-    const cyanGrad = ctx.createRadialGradient(cX, cY, 5, cX, cY, r * 0.75);
-    cyanGrad.addColorStop(0, 'rgba(34, 211, 238, 0.95)');
-    cyanGrad.addColorStop(0.5, 'rgba(6, 182, 212, 0.6)');
+    // Blob 1: Vibrant Siri Cyan (Image 2)
+    const cX = cx + Math.sin(time * 1.1) * 26;
+    const cY = cy + Math.cos(time * 0.95) * 24 - 12;
+    const cyanGrad = ctx.createRadialGradient(cX, cY, 4, cX, cY, r * 0.82);
+    cyanGrad.addColorStop(0, 'rgba(34, 211, 238, 0.98)');
+    cyanGrad.addColorStop(0.45, 'rgba(6, 182, 212, 0.65)');
     cyanGrad.addColorStop(1, 'rgba(6, 182, 212, 0)');
     ctx.fillStyle = cyanGrad;
     ctx.beginPath();
-    ctx.arc(cX, cY, r * 0.75, 0, Math.PI * 2);
+    ctx.arc(cX, cY, r * 0.82, 0, Math.PI * 2);
     ctx.fill();
 
-    // Blob 2: Deep Crimson/Red (Image 2)
-    const mX = cx + Math.cos(time * 0.8) * 20;
-    const mY = cy + Math.sin(time * 1.2) * 22 + 15;
-    const magGrad = ctx.createRadialGradient(mX, mY, 5, mX, mY, r * 0.8);
-    magGrad.addColorStop(0, 'rgba(225, 29, 72, 0.95)');
-    magGrad.addColorStop(0.5, 'rgba(244, 63, 94, 0.65)');
+    // Blob 2: Deep Crimson / Rose Red (Image 2)
+    const mX = cx + Math.cos(time * 0.85) * 24;
+    const mY = cy + Math.sin(time * 1.25) * 26 + 18;
+    const magGrad = ctx.createRadialGradient(mX, mY, 4, mX, mY, r * 0.88);
+    magGrad.addColorStop(0, 'rgba(225, 29, 72, 0.98)');
+    magGrad.addColorStop(0.5, 'rgba(244, 63, 94, 0.7)');
     magGrad.addColorStop(1, 'rgba(225, 29, 72, 0)');
     ctx.fillStyle = magGrad;
     ctx.beginPath();
-    ctx.arc(mX, mY, r * 0.8, 0, Math.PI * 2);
+    ctx.arc(mX, mY, r * 0.88, 0, Math.PI * 2);
     ctx.fill();
 
-    // Blob 3: Violet/Purple (Image 2)
-    const vX = cx + Math.sin(time * 1.4 + 1.5) * 24;
-    const vY = cy + Math.cos(time * 1.1 + 1.5) * 20 - 5;
-    const vioGrad = ctx.createRadialGradient(vX, vY, 5, vX, vY, r * 0.7);
-    vioGrad.addColorStop(0, 'rgba(168, 85, 247, 0.9)');
-    vioGrad.addColorStop(0.5, 'rgba(192, 132, 252, 0.55)');
+    // Blob 3: Vivid Purple / Violet (Image 2)
+    const vX = cx + Math.sin(time * 1.35 + 1.8) * 28;
+    const vY = cy + Math.cos(time * 1.15 + 1.8) * 24 - 8;
+    const vioGrad = ctx.createRadialGradient(vX, vY, 4, vX, vY, r * 0.78);
+    vioGrad.addColorStop(0, 'rgba(168, 85, 247, 0.95)');
+    vioGrad.addColorStop(0.5, 'rgba(192, 132, 252, 0.6)');
     vioGrad.addColorStop(1, 'rgba(168, 85, 247, 0)');
     ctx.fillStyle = vioGrad;
     ctx.beginPath();
-    ctx.arc(vX, vY, r * 0.7, 0, Math.PI * 2);
+    ctx.arc(vX, vY, r * 0.78, 0, Math.PI * 2);
     ctx.fill();
 
-    // Blob 4: White Hot Core Flare (Image 2)
-    const coreX = cx + Math.sin(time * 1.5) * 8;
-    const coreY = cy + Math.cos(time * 1.5) * 8;
-    const coreGrad = ctx.createRadialGradient(coreX, coreY, 0, coreX, coreY, r * 0.45);
-    coreGrad.addColorStop(0, 'rgba(255, 255, 255, 0.98)');
-    coreGrad.addColorStop(0.4, 'rgba(255, 230, 255, 0.7)');
+    // Blob 4: White Hot Core Flare (Center)
+    const coreX = cx + Math.sin(time * 1.6) * 10;
+    const coreY = cy + Math.cos(time * 1.6) * 10;
+    const coreGrad = ctx.createRadialGradient(coreX, coreY, 0, coreX, coreY, r * 0.5);
+    coreGrad.addColorStop(0, 'rgba(255, 255, 255, 1)');
+    coreGrad.addColorStop(0.35, 'rgba(255, 235, 255, 0.85)');
     coreGrad.addColorStop(1, 'rgba(255, 255, 255, 0)');
     ctx.fillStyle = coreGrad;
     ctx.beginPath();
-    ctx.arc(coreX, coreY, r * 0.45, 0, Math.PI * 2);
+    ctx.arc(coreX, coreY, r * 0.5, 0, Math.PI * 2);
     ctx.fill();
 
     ctx.restore();
 
-    // 2. Outer Glass Shell & Reflection
+    // 3. 3D Glass Shell Glint & Fresnel Border
     ctx.save();
     ctx.beginPath();
     ctx.arc(cx, cy, r, 0, Math.PI * 2);
-    ctx.lineWidth = 1.5;
-    ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.45)';
     ctx.stroke();
 
     const glassGrad = ctx.createLinearGradient(cx - r, cy - r, cx + r, cy + r);
-    glassGrad.addColorStop(0, 'rgba(255, 255, 255, 0.4)');
-    glassGrad.addColorStop(0.25, 'rgba(255, 255, 255, 0.08)');
+    glassGrad.addColorStop(0, 'rgba(255, 255, 255, 0.5)');
+    glassGrad.addColorStop(0.2, 'rgba(255, 255, 255, 0.12)');
     glassGrad.addColorStop(0.5, 'transparent');
     ctx.fillStyle = glassGrad;
     ctx.fill();
     ctx.restore();
+
+    // 4. Draw 3D Orbiting Front Rings (wrapping around front of sphere, Image 1)
+    drawOrbitRings(ctx, cx, cy, r, time, false);
 
     requestAnimationFrame(render);
   }

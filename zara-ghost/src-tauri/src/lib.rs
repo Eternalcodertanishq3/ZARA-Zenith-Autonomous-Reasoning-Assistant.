@@ -14,7 +14,7 @@ async fn morph_window(window: WebviewWindow, task: String) {
     let center_x = screen_size.width / 2.0;
 
     let (w, h, x, y, click_through) = match task.as_str() {
-        "idle"   => (120.0, 120.0, center_x - 60.0,  20.0,  true),
+        "idle"   => (200.0, 200.0, center_x - 100.0, 20.0,  true),
         "chat"   => (420.0, 680.0, center_x - 210.0, 160.0, false),
         "code"   => (900.0, 520.0, center_x - 450.0, 160.0, false),
         "system" => (380.0, 380.0, center_x - 190.0, 160.0, false),

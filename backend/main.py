@@ -49,6 +49,14 @@ logger = logging.getLogger("ZARA_MAIN")
 # Ensure logs directory exists
 os.makedirs('logs', exist_ok=True)
 
+# 🛡️ Activate Privacy Network Guard
+try:
+    from utils.network_guard import NetworkBlocker
+    NetworkBlocker.install()
+    logger.info("🛡️ Privacy NetworkBlocker activated — non-localhost sockets blocked.")
+except Exception as e:
+    logger.debug(f"NetworkBlocker setup: {e}")
+
 # ═══════════════════════════════════════════════════════════════════
 # CRITICAL: Pre-import ctranslate2 BEFORE httpx (loaded by ollama)
 # On Windows, importing ctranslate2 AFTER httpx causes a hard

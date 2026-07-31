@@ -34,6 +34,16 @@ function connectWS() {
       if (data.type === 'task_detected' && data.task) {
         morphTo(data.task);
       }
+      if (data.type === 'system_stats') {
+        const cpuEl = document.getElementById('cpu-val');
+        const ramEl = document.getElementById('ram-val');
+        if (cpuEl && data.cpu) cpuEl.textContent = data.cpu;
+        if (ramEl && data.ram) ramEl.textContent = data.ram;
+      }
+      if (data.type === 'vision_update' && data.content) {
+        const visEl = document.getElementById('vision-text');
+        if (visEl) visEl.textContent = data.content;
+      }
     } catch (err) {
       console.warn('Received non-JSON message:', e.data);
       if (typeof e.data === 'string' && e.data.trim()) {

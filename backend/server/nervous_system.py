@@ -435,6 +435,40 @@ def build_app(zara) -> FastAPI:
         logger.info(f"[SERVER]   Brain: {'running' if getattr(zara, 'is_running', False) else 'offline'}")
         logger.info(f"[SERVER]   Frontend: {_FRONTEND_DIR}")
 
+        async def _stats_loop():
+            try:
+                import psutil
+                while True:
+                    await asyncio.sleep(2)
+                    if manager._connections:
+                        cpu = psutil.cpu_percent(interval=None)
+                        ram = psutil.virtual_memory()
+                        ram_gb = round(ram.used / (1024 ** 3), 1)
+                        await manager.broadcast({
+                            "type": "system_stats",
+                            "cpu": f"{int(cpu)}%",
+                            "ram": f"{ram_gb}GB"
+                        })
+            except Exception as e:
+                logger.debug(f"Stats loop error: {e}")
+
+        async def _vision_loop():
+            while True:
+                try:
+                    await asyncio.sleep(1)
+                    if hasattr(zara, 'vision_queue') and zara.vision_queue and not zara.vision_queue.empty():
+                        v_data = zara.vision_queue.get_nowait()
+                        if isinstance(v_data, dict) and v_data.get("type") == "vision":
+                            await manager.broadcast({
+                                "type": "vision_update",
+                                "content": v_data.get("content", "")
+                            })
+                except Exception:
+                    pass
+
+        asyncio.create_task(_stats_loop())
+        asyncio.create_task(_vision_loop())
+
     @app.on_event("shutdown")
     async def on_shutdown():
         logger.info("[SERVER] Nervous System shutting down...")

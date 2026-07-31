@@ -9,7 +9,7 @@ const dragHandle = document.getElementById('drag-handle') as HTMLElement;
 const taskLabel = document.getElementById('task-label') as HTMLElement;
 
 const layouts: Record<string, { w: number; h: number; radius: string }> = {
-  idle:   { w: 80,  h: 80,  radius: '50%' },
+  idle:   { w: 120, h: 120, radius: '50%' },
   chat:   { w: 420, h: 680, radius: '18px' },
   code:   { w: 900, h: 520, radius: '16px' },
   system: { w: 380, h: 380, radius: '22px' },
@@ -60,6 +60,7 @@ function morphTo(task: string) {
   currentTask = task;
   const L = layouts[task] || layouts.chat;
   
+  container.setAttribute('data-task', task);
   container.style.width = `${L.w}px`;
   container.style.height = `${L.h}px`;
   container.style.borderRadius = L.radius;
@@ -72,6 +73,10 @@ function morphTo(task: string) {
   }
   
   if (task === 'idle') {
+    container.style.background = 'transparent';
+    container.style.backdropFilter = 'none';
+    container.style.border = 'none';
+    container.style.boxShadow = 'none';
     idleCore.style.display = 'flex';
     header.style.display = 'none';
     header.style.opacity = '0';
@@ -83,6 +88,10 @@ function morphTo(task: string) {
       document.querySelectorAll('.layout').forEach(l => (l as HTMLElement).style.display = 'none');
     }, 300);
   } else {
+    container.style.background = '';
+    container.style.backdropFilter = '';
+    container.style.border = '';
+    container.style.boxShadow = '';
     idleCore.style.display = 'none';
     header.style.display = 'flex';
     tabs.style.display = 'flex';

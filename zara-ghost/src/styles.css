@@ -1,3 +1,8 @@
+/* ═══════════════════════════════════════════════════════════════
+   ZARA Ghost — Glass-First Liquid Glass UI
+   All visual rendering handled by WebGL2; DOM overlays for text
+   ═══════════════════════════════════════════════════════════════ */
+
 * { margin: 0; padding: 0; box-sizing: border-box; outline: none !important; }
 
 html, body {
@@ -10,106 +15,68 @@ html, body {
   height: 100vh;
 }
 
-#zara-container {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  background: transparent; /* NO background in idle */
-  border: none;
-  box-shadow: none;
-  transition: all 0.55s cubic-bezier(0.34, 1.56, 0.64, 1);
-  overflow: visible;
-  display: flex;
-  flex-direction: column;
-}
+/* ═════════════════════════════════════════════════════════════
+   WebGL Canvas — fills entire window, renders the glass orb
+   ═════════════════════════════════════════════════════════════ */
 
-#zara-container[data-task="idle"] {
-  background: transparent !important;
-  border: none !important;
-  box-shadow: none !important;
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
-}
-
-/* Only add glass background when NOT idle */
-#zara-container:not([data-task="idle"]) {
-  background: rgba(8, 12, 24, 0.78);
-  backdrop-filter: blur(28px) saturate(1.4);
-  -webkit-backdrop-filter: blur(28px) saturate(1.4);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  box-shadow: 
-    0 16px 50px rgba(0, 0, 0, 0.6),
-    0 0 30px rgba(34, 211, 238, 0.15),
-    0 0 50px rgba(225, 29, 72, 0.1),
-    inset 0 1px 0 rgba(255, 255, 255, 0.15);
-  border-radius: 20px;
-  overflow: hidden;
-  position: relative;
-}
-
-/* Liquid Iridescent Top Edge Highlight */
-#zara-container:not([data-task="idle"])::before {
-  content: '';
-  position: absolute;
+#siri-canvas {
+  position: fixed;
   top: 0;
   left: 0;
-  right: 0;
-  height: 2px;
-  background: linear-gradient(
-    90deg,
-    rgba(34, 211, 238, 0.8),
-    rgba(225, 29, 72, 0.8),
-    rgba(168, 85, 247, 0.8),
-    rgba(34, 211, 238, 0.8)
-  );
-  z-index: 100;
-  pointer-events: none;
+  width: 100%;
+  height: 100%;
+  display: block;
+  cursor: grab;
+}
+
+#siri-canvas:active {
+  cursor: grabbing;
 }
 
 /* ═════════════════════════════════════════════════════════════
-   SIRI DYNAMIC NEURAL ORB & ORBIT RINGS
+   Pill Overlay — DOM content rendered OVER the glass panel
+   Positioned in center, transforms follow drag springs
    ═════════════════════════════════════════════════════════════ */
 
-#idle-core {
-  position: absolute;
-  inset: 0;
+#pill-overlay {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  z-index: 10;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  background: transparent !important;
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
-  overflow: visible;
 }
 
-.siri-orb-wrapper {
-  position: relative;
-  width: 160px;
-  height: 160px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  animation: siriFloat 3.5s ease-in-out infinite;
-  cursor: pointer;
+#pill-overlay * {
+  pointer-events: auto;
 }
 
-#siri-canvas {
-  width: 160px;
-  height: 160px;
-  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+/* ═════════════════════════════════════════════════════════════
+   Hint Text (below the orb in idle)
+   ═════════════════════════════════════════════════════════════ */
+
+#siri-hint {
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  margin-top: 80px;
+  text-align: center;
+  transition: opacity 0.3s;
+  pointer-events: none;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
 }
 
-.siri-orb-wrapper:hover #siri-canvas {
-  transform: scale(1.08);
-}
+/* ═════════════════════════════════════════════════════════════
+   Header — shown when expanded (chat/code/system/vision)
+   ═════════════════════════════════════════════════════════════ */
 
-@keyframes siriFloat {
-  0%, 100% { transform: translateY(0px) scale(1); }
-  50% { transform: translateY(-5px) scale(1.03); }
-}
-
-/* Header */
 #win-header {
+  width: 100%;
   height: 42px;
   display: none;
   align-items: center;
@@ -121,11 +88,13 @@ html, body {
   transition: opacity 0.25s;
   cursor: default;
 }
+
 .header-left {
   display: flex;
   align-items: center;
   gap: 8px;
 }
+
 .status-dot {
   width: 7px;
   height: 7px;
@@ -133,44 +102,56 @@ html, body {
   background: #38bdf8;
   box-shadow: 0 0 8px #38bdf8;
 }
+
 #task-label {
   color: #e2e8f0;
   font-size: 12px;
   font-weight: 600;
   letter-spacing: 0.08em;
 }
+
 .win-btn {
   background: transparent;
   border: none;
-  color: #64748b;
+  color: #94a3b8;
   font-size: 16px;
   cursor: pointer;
   padding: 4px 8px;
   border-radius: 6px;
   transition: all 0.2s;
 }
-.win-btn:hover { color: #e2e8f0; background: rgba(255,255,255,0.05); }
 
-/* Content */
+.win-btn:hover { color: #e2e8f0; background: rgba(255,255,255,0.08); }
+
+/* ═════════════════════════════════════════════════════════════
+   Content Area — panels inside the glass pill
+   ═════════════════════════════════════════════════════════════ */
+
 #win-content {
   flex: 1;
   overflow: hidden;
   opacity: 0;
   transition: opacity 0.3s;
   position: relative;
+  width: 100%;
 }
+
 .layout {
   display: none;
   width: 100%;
   height: 100%;
 }
 
-/* Chat */
+/* ═════════════════════════════════════════════════════════════
+   CHAT LAYOUT — Liquid Glass Chat
+   ═════════════════════════════════════════════════════════════ */
+
 #layout-chat {
   flex-direction: column;
   padding: 14px;
   gap: 10px;
 }
+
 .chat-messages {
   flex: 1;
   overflow-y: auto;
@@ -178,6 +159,7 @@ html, body {
   flex-direction: column;
   gap: 8px;
 }
+
 .msg {
   max-width: 85%;
   padding: 10px 14px;
@@ -187,69 +169,87 @@ html, body {
   color: #cbd5e1;
   animation: msgIn 0.3s ease-out;
 }
+
 @keyframes msgIn {
   from { opacity: 0; transform: translateY(8px); }
   to { opacity: 1; transform: translateY(0); }
 }
+
 .msg.bot {
   align-self: flex-start;
-  background: rgba(255,255,255,0.05);
+  background: rgba(255,255,255,0.06);
   border-radius: 14px 14px 14px 4px;
+  backdrop-filter: blur(8px);
 }
+
 .msg.user {
   align-self: flex-end;
-  background: rgba(56,189,248,0.12);
+  background: rgba(56,189,248,0.15);
   color: #e0f2fe;
   border-radius: 14px 14px 4px 14px;
+  backdrop-filter: blur(8px);
 }
+
 .chat-input {
   display: flex;
   gap: 8px;
   height: 40px;
 }
+
 .chat-input input {
   flex: 1;
-  background: rgba(255,255,255,0.04);
-  border: 1px solid rgba(255,255,255,0.06);
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.08);
   border-radius: 12px;
   padding: 0 14px;
   color: #e2e8f0;
   font-size: 13px;
   outline: none;
+  backdrop-filter: blur(8px);
 }
+
 .chat-input input::placeholder { color: #475569; }
+
 .chat-input button {
   width: 40px;
   height: 40px;
   border-radius: 12px;
-  background: rgba(56,189,248,0.15);
+  background: rgba(56,189,248,0.18);
   border: 1px solid rgba(56,189,248,0.25);
   color: #38bdf8;
   cursor: pointer;
   font-size: 14px;
   transition: all 0.2s;
 }
-.chat-input button:hover { background: rgba(56,189,248,0.25); }
 
-/* Code */
+.chat-input button:hover { background: rgba(56,189,248,0.3); }
+
+/* ═════════════════════════════════════════════════════════════
+   CODE LAYOUT — Liquid Glass Code Editor
+   ═════════════════════════════════════════════════════════════ */
+
 #layout-code {
   display: none;
   padding: 14px;
   gap: 12px;
 }
+
 .code-sidebar {
   width: 160px;
   flex-shrink: 0;
-  background: rgba(0,0,0,0.2);
+  background: rgba(0,0,0,0.25);
   border-radius: 12px;
   padding: 12px;
+  backdrop-filter: blur(8px);
 }
+
 .sidebar-title {
   color: #475569;
   font-size: 10px;
   letter-spacing: 0.12em;
   margin-bottom: 10px;
 }
+
 .file-item {
   color: #64748b;
   font-size: 12px;
@@ -258,13 +258,15 @@ html, body {
   cursor: pointer;
   transition: all 0.15s;
 }
+
 .file-item:hover, .file-item.active {
-  background: rgba(56,189,248,0.1);
+  background: rgba(56,189,248,0.12);
   color: #38bdf8;
 }
+
 .code-editor {
   flex: 1;
-  background: rgba(0,0,0,0.25);
+  background: rgba(0,0,0,0.3);
   border-radius: 12px;
   padding: 16px;
   font-family: 'JetBrains Mono', 'Fira Code', monospace;
@@ -272,25 +274,32 @@ html, body {
   line-height: 1.7;
   color: #e2e8f0;
   overflow: auto;
+  backdrop-filter: blur(8px);
 }
+
 .kw { color: #c084fc; }
 .fn { color: #38bdf8; }
 .cm { color: #475569; }
 .st { color: #a3e635; }
 
-/* System */
+/* ═════════════════════════════════════════════════════════════
+   SYSTEM LAYOUT — Liquid Glass System Monitor
+   ═════════════════════════════════════════════════════════════ */
+
 #layout-system {
   display: none;
   padding: 18px;
 }
+
 .sys-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 12px;
   height: 100%;
 }
+
 .sys-card {
-  background: rgba(255,255,255,0.03);
+  background: rgba(255,255,255,0.04);
   border-radius: 16px;
   padding: 16px;
   display: flex;
@@ -298,24 +307,29 @@ html, body {
   align-items: center;
   justify-content: center;
   gap: 8px;
+  backdrop-filter: blur(8px);
 }
+
 .sys-label {
   color: #475569;
   font-size: 10px;
   letter-spacing: 0.12em;
 }
+
 .sys-value {
   color: #e2e8f0;
   font-size: 26px;
   font-weight: 700;
 }
+
 .sys-bar {
   width: 80%;
   height: 4px;
-  background: rgba(255,255,255,0.05);
+  background: rgba(255,255,255,0.06);
   border-radius: 2px;
   overflow: hidden;
 }
+
 .sys-fill {
   height: 100%;
   background: #38bdf8;
@@ -323,52 +337,65 @@ html, body {
   transition: width 0.5s ease;
 }
 
-/* Vision */
+/* ═════════════════════════════════════════════════════════════
+   VISION LAYOUT — Liquid Glass Vision
+   ═════════════════════════════════════════════════════════════ */
+
 #layout-vision {
   display: none;
   padding: 14px 18px;
   align-items: center;
   gap: 16px;
 }
+
 .vision-cam {
   width: 80px;
   height: 56px;
-  background: rgba(0,0,0,0.3);
+  background: rgba(0,0,0,0.35);
   border-radius: 8px;
-  border: 1px solid rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.08);
   display: flex;
   align-items: center;
   justify-content: center;
   color: #475569;
   font-size: 10px;
   flex-shrink: 0;
+  backdrop-filter: blur(8px);
 }
+
 .vision-title {
   color: #e2e8f0;
   font-size: 13px;
   font-weight: 600;
   margin-bottom: 4px;
 }
+
 .vision-desc {
   color: #64748b;
   font-size: 12px;
   line-height: 1.4;
 }
+
 .vision-tags {
   display: flex;
   gap: 6px;
   margin-left: auto;
 }
+
 .tag {
-  background: rgba(56,189,248,0.12);
+  background: rgba(56,189,248,0.15);
   color: #38bdf8;
   padding: 3px 10px;
   border-radius: 20px;
   font-size: 11px;
   font-weight: 600;
+  backdrop-filter: blur(8px);
 }
 
-/* Corner Tabs */
+/* ═════════════════════════════════════════════════════════════
+   Corner Tabs — inside the glass pill
+   ═════════════════════════════════════════════════════════════ */
+
 #corner-tabs {
   position: absolute;
   bottom: 10px;
@@ -379,42 +406,37 @@ html, body {
   opacity: 0;
   transition: opacity 0.25s;
 }
+
 .tab {
   width: 32px;
   height: 32px;
   border-radius: 10px;
   border: 1px solid;
-  background: transparent;
+  background: rgba(0,0,0,0.2);
   cursor: pointer;
   font-size: 14px;
   display: flex;
   align-items: center;
   justify-content: center;
   transition: all 0.2s;
+  backdrop-filter: blur(8px);
 }
+
 .tab-chat { color: #38bdf8; border-color: rgba(56,189,248,0.25); }
-.tab-chat:hover { background: rgba(56,189,248,0.2); }
+.tab-chat:hover { background: rgba(56,189,248,0.25); }
 .tab-code { color: #c084fc; border-color: rgba(192,132,252,0.25); }
-.tab-code:hover { background: rgba(192,132,252,0.2); }
+.tab-code:hover { background: rgba(192,132,252,0.25); }
 .tab-sys { color: #a3e635; border-color: rgba(163,230,53,0.25); }
-.tab-sys:hover { background: rgba(163,230,53,0.2); }
+.tab-sys:hover { background: rgba(163,230,53,0.25); }
 .tab-eye { color: #fbbf24; border-color: rgba(251,191,36,0.25); }
-.tab-eye:hover { background: rgba(251,191,36,0.2); }
-.tab-close { color: #475569; border-color: rgba(255,255,255,0.08); border-radius: 50%; }
-.tab-close:hover { color: #e2e8f0; background: rgba(255,255,255,0.08); }
+.tab-eye:hover { background: rgba(251,191,36,0.25); }
+.tab-close { color: #64748b; border-color: rgba(255,255,255,0.1); border-radius: 50%; }
+.tab-close:hover { color: #e2e8f0; background: rgba(255,255,255,0.1); }
 
-/* Drag handle */
-#drag-handle {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 42px;
-  -webkit-app-region: drag;
-  display: none;
-}
+/* ═════════════════════════════════════════════════════════════
+   Scrollbar
+   ═════════════════════════════════════════════════════════════ */
 
-/* Scrollbar */
 ::-webkit-scrollbar { width: 4px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 4px; }

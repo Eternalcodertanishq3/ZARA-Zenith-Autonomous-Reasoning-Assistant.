@@ -7,15 +7,15 @@
   <link rel="stylesheet" href="/src/styles.css" />
 </head>
 <body>
-  <div id="zara-container">
-    <!-- Idle Core -->
-    <div id="idle-core">
-      <div class="siri-orb-wrapper">
-        <canvas id="siri-canvas" width="300" height="300"></canvas>
-      </div>
-    </div>
+  <!-- WebGL2 canvas fills entire window — the glass shader handles everything -->
+  <canvas id="siri-canvas"></canvas>
 
-    <!-- Header -->
+  <!-- Pill overlay: DOM content rendered OVER the glass panel -->
+  <div id="pill-overlay">
+    <!-- Idle hint -->
+    <div id="siri-hint">Click to ask · hold to speak</div>
+
+    <!-- Header (shown in expanded states) -->
     <div id="win-header">
       <div class="header-left">
         <div class="status-dot"></div>
@@ -27,7 +27,7 @@
       </div>
     </div>
 
-    <!-- Content -->
+    <!-- Content panels -->
     <div id="win-content">
       
       <!-- CHAT -->
@@ -84,7 +84,7 @@
       <!-- VISION -->
       <div id="layout-vision" class="layout">
         <div class="vision-cam">CAM</div>
-        <div class="vision-text">
+        <div class="vision-text-wrap">
           <div class="vision-title">Scene Analysis</div>
           <div class="vision-desc" id="vision-text">Waiting for visual input...</div>
         </div>
@@ -103,9 +103,6 @@
       <button class="tab tab-close" onclick="morphTo('idle')" title="Minimize">✕</button>
     </div>
   </div>
-
-  <!-- Drag handle (invisible, top area) -->
-  <div id="drag-handle" onmousedown="startDrag()"></div>
 
   <script type="module" src="/src/main.ts"></script>
 </body>

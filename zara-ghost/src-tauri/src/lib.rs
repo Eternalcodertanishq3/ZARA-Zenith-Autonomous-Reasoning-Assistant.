@@ -12,13 +12,16 @@ async fn morph_window(window: WebviewWindow, task: String) {
     let screen_size = monitor.size().to_logical::<f64>(scale_factor);
 
     let center_x = screen_size.width / 2.0;
+    let center_y = screen_size.height / 2.0;
 
     let (w, h, x, y, click_through) = match task.as_str() {
-        "idle"   => (200.0, 200.0, center_x - 100.0, 20.0,  true),
-        "chat"   => (420.0, 680.0, center_x - 210.0, 160.0, false),
+        // Glass orb needs full canvas for refraction pipeline
+        "idle"   => (500.0, 400.0, center_x - 250.0, center_y - 200.0, false),
+        "chat"   => (500.0, 400.0, center_x - 250.0, center_y - 200.0, false),
         "code"   => (900.0, 520.0, center_x - 450.0, 160.0, false),
-        "system" => (380.0, 380.0, center_x - 190.0, 160.0, false),
-        "vision" => (700.0, 140.0, center_x - 350.0, 160.0, false),
+        "system" => (500.0, 400.0, center_x - 250.0, center_y - 200.0, false),
+        "vision" => (700.0, 400.0, center_x - 350.0, center_y - 200.0, false),
+        "thinking" => (500.0, 400.0, center_x - 250.0, center_y - 200.0, false),
         _ => return,
     };
 

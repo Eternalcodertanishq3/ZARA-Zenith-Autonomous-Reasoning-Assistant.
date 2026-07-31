@@ -14,8 +14,8 @@
     "windows": [
       {
         "title": "ZARA",
-        "width": 200,
-        "height": 200,
+        "width": 500,
+        "height": 400,
         "decorations": false,
         "transparent": true,
         "shadow": false,

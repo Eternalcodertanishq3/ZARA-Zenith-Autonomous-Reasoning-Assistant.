@@ -18,14 +18,14 @@ function tauriInvoke(cmd: string, args?: Record<string, unknown>): void {
 }
 
 // ═══════════════════════════════════════════════════════════════
-//  Task-specific pill sizes
+//  Task-specific pill sizes (Matching z1han exact proportions)
 // ═══════════════════════════════════════════════════════════════
 
 const TASK_SIZES: Record<string, { width: number; height: number }> = {
-  chat:    { width: 520, height: 280 },
-  code:    { width: 860, height: 520 },
-  system:  { width: 480, height: 400 },
-  vision:  { width: 640, height: 220 },
+  chat:    { width: 480, height: 160 },
+  code:    { width: 780, height: 420 },
+  system:  { width: 480, height: 320 },
+  vision:  { width: 600, height: 200 },
 };
 
 // ═══════════════════════════════════════════════════════════════
@@ -60,7 +60,7 @@ try {
 siriState.select('idle');
 
 // ═══════════════════════════════════════════════════════════════
-//  morphTo — state transitions
+//  morphTo — state transitions with spring animation
 // ═══════════════════════════════════════════════════════════════
 
 function morphTo(task: string): void {
@@ -88,7 +88,7 @@ function morphTo(task: string): void {
 
 function updateLayout(task: string): void {
   const isExpanded = task !== 'idle' && task !== 'thinking';
-  taskLabel.textContent = task === 'idle' ? 'ZARA' : task.toUpperCase();
+  taskLabel.textContent = task === 'idle' ? 'ZARA' : 'Ask ZARA';
 
   const layouts = document.querySelectorAll('.layout');
   layouts.forEach((l) => {
@@ -102,6 +102,13 @@ function updateLayout(task: string): void {
       activeLayout.style.display = 'flex';
     }
   }
+
+  // Update active chip state
+  const chips = document.querySelectorAll('.chip');
+  chips.forEach((c) => c.classList.remove('active'));
+  const targetClass = task === 'vision' ? 'chip-eye' : `chip-${task}`;
+  const activeChip = document.querySelector(`.${targetClass}`);
+  if (activeChip) activeChip.classList.add('active');
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -123,7 +130,7 @@ window.addEventListener('pointerdown', (e: PointerEvent) => {
   const isInteractive = target.closest('input') ||
                         target.closest('textarea') ||
                         target.closest('button') ||
-                        target.closest('.tab') ||
+                        target.closest('.chip') ||
                         target.closest('.file-item') ||
                         target.closest('.chat-messages') ||
                         target.closest('.sys-card');
@@ -146,7 +153,6 @@ function getOrbHit(e: MouseEvent): { dist: number; isInside: boolean } {
   const dx = clickX - centerX;
   const dy = clickY - centerY;
   const dist = Math.hypot(dx, dy);
-  // Strict hit radius: 60px in idle mode (exact orb radius)
   const hitRadius = currentTask === 'idle' ? 60 : 120;
   return { dist, isInside: dist <= hitRadius };
 }
@@ -159,7 +165,7 @@ canvas.addEventListener('pointerdown', (e: PointerEvent) => {
   const { isInside } = getOrbHit(e);
 
   if (currentTask === 'idle') {
-    if (!isInside) return; // Strict: Discard if click is outside the 60px orb radius!
+    if (!isInside) return;
   }
 
   isPressed = true;
@@ -208,7 +214,6 @@ canvas.addEventListener('pointerup', (e: PointerEvent) => {
 });
 
 canvas.addEventListener('pointermove', (_e: PointerEvent) => {
-  // NO grab cursor on hover! Keep cursor default on hover, grabbing ONLY when holding down.
   canvas.style.cursor = isPressed ? 'grabbing' : 'default';
 
   if (isPressed) {

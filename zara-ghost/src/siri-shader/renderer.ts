@@ -172,7 +172,7 @@ export class SiriRenderer {
     effectComposite: ProgramEntry;
     glassComposite: ProgramEntry;
   };
-  public container = { black: 0.22, fade: 0.65, gauss: 10.0, strength: 0.85 };
+  public container = { black: 0.28, fade: 0.55, gauss: 12.0, strength: 0.95 };
   public chipLenses = {
     rects: [[0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]] as number[][],
     states: [0, 0, 0],

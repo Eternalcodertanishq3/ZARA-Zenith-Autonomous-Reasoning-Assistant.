@@ -141,6 +141,28 @@ let pressStartTime = 0;
 let pressTimeout: ReturnType<typeof setTimeout> | null = null;
 
 canvas.addEventListener('pointerdown', (e: PointerEvent) => {
+  const rect = canvas.getBoundingClientRect();
+  const clickX = e.clientX - rect.left;
+  const clickY = e.clientY - rect.top;
+  const centerX = rect.width / 2;
+  const centerY = rect.height / 2;
+  const dx = clickX - centerX;
+  const dy = clickY - centerY;
+  const dist = Math.hypot(dx, dy);
+
+  if (currentTask === 'idle') {
+    // Orb diameter is 128px (radius 64px). Allow max 74px hit radius.
+    if (dist > 74) {
+      return;
+    }
+  } else {
+    // In expanded mode, check if click is inside pill bounds
+    const size = TASK_SIZES[currentTask] || TASK_SIZES.chat;
+    if (Math.abs(dx) > size.width / 2 || Math.abs(dy) > size.height / 2) {
+      return;
+    }
+  }
+
   isPressed = true;
   pressStartTime = performance.now();
   siriState.setPressed(true);

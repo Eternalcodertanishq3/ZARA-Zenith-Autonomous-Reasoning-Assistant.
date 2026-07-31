@@ -153,13 +153,19 @@ canvas.addEventListener('pointerdown', (e: PointerEvent) => {
   const { isInside } = getOrbHit(e);
 
   if (currentTask === 'idle') {
-    if (!isInside) return; // Discard completely if pointer is outside orb!
+    if (!isInside) return;
   } else {
+    // In expanded pill mode, check if click is outside interactive elements/pill bounds
+    const target = e.target as HTMLElement;
+    const isInteractive = target.closest('.chat-input') || target.closest('.tab') || target.closest('.win-btn') || target.closest('.file-item');
+
     const rect = canvas.getBoundingClientRect();
     const dx = e.clientX - rect.left - rect.width / 2;
     const dy = e.clientY - rect.top - rect.height / 2;
     const size = TASK_SIZES[currentTask] || TASK_SIZES.chat;
-    if (Math.abs(dx) > size.width / 2 || Math.abs(dy) > size.height / 2) {
+
+    if (!isInteractive && (Math.abs(dx) > size.width / 2 || Math.abs(dy) > size.height / 2)) {
+      morphTo('idle');
       return;
     }
   }

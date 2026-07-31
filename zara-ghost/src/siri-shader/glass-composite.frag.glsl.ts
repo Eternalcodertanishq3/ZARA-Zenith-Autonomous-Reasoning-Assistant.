@@ -180,12 +180,8 @@ vec4 glassFragment(vec2 pixel) {
 	float hl = highlightBand(d, grad) * uHlAmount;
 	col += vec3(hl);
 
-	// Fresnel / glass edge opacity profile (translucent in center, solid on rim)
-	float distFromCenter = length(p) / max(min(halfSize.x, halfSize.y), 0.001);
-	float fresnel = pow(clamp(distFromCenter, 0.0, 1.0), 2.2);
-	float glassAlpha = mix(0.28, 0.85, fresnel) * shapeMask;
-	float finalAlpha = max(glassAlpha, sceneSample.a * shapeMask);
-	finalAlpha = clamp(finalAlpha + hl * 0.5, 0.0, 1.0);
+	float pillAlpha = max(sceneSample.a, 0.12) * shapeMask;
+	float finalAlpha = clamp(pillAlpha + hl * 0.6, 0.0, 1.0);
 
 	return vec4(col, finalAlpha);
 }

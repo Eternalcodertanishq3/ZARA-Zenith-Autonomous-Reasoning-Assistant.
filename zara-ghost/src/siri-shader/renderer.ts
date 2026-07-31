@@ -172,7 +172,7 @@ export class SiriRenderer {
     effectComposite: ProgramEntry;
     glassComposite: ProgramEntry;
   };
-  public container = { black: 0.12, fade: 0.6, gauss: 14, strength: 0.2 };
+  public container = { black: 0.22, fade: 0.65, gauss: 10.0, strength: 0.85 };
   public chipLenses = {
     rects: [[0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]] as number[][],
     states: [0, 0, 0],
@@ -208,54 +208,16 @@ export class SiriRenderer {
       effectComposite: createProgram(gl, EFFECT_COMPOSITE_FRAGMENT_SHADER, 'effect composite'),
       glassComposite: createProgram(gl, GLASS_COMPOSITE_FRAGMENT_SHADER, 'glass composite'),
     };
-    this.backgroundTexture = this._createScenicTexture();
-    this.backgroundReady = 1;
-    this.backgroundSize = [1024, 1024];
+    this.backgroundTexture = createLinearClampTexture(gl);
+    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 0);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array([0, 0, 0, 0]));
     gl.bindVertexArray(this.vertexArray);
     gl.disable(gl.DEPTH_TEST);
     gl.disable(gl.STENCIL_TEST);
+    this.backgroundReady = 0;
+    this.backgroundSize = [1, 1];
     this.effectTarget = null;
     this.sceneTarget = null;
-  }
-
-  private _createScenicTexture(): WebGLTexture {
-    const gl = this.gl;
-    const canvas = document.createElement('canvas');
-    canvas.width = 1024;
-    canvas.height = 1024;
-    const ctx = canvas.getContext('2d')!;
-
-    const skyGrad = ctx.createLinearGradient(0, 0, 0, 1024);
-    skyGrad.addColorStop(0, '#103866');
-    skyGrad.addColorStop(0.35, '#4a90e2');
-    skyGrad.addColorStop(0.62, '#f7d3a6');
-    skyGrad.addColorStop(0.72, '#2d7a32');
-    skyGrad.addColorStop(1, '#1b5e20');
-    ctx.fillStyle = skyGrad;
-    ctx.fillRect(0, 0, 1024, 1024);
-
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
-    for (let i = 0; i < 18; i++) {
-      ctx.beginPath();
-      const cx = (i * 73) % 1024;
-      const cy = 250 + ((i * 47) % 350);
-      const rx = 120 + ((i * 31) % 160);
-      const ry = 45 + ((i * 19) % 55);
-      ctx.ellipse(cx, cy, rx, ry, 0, 0, Math.PI * 2);
-      ctx.fill();
-    }
-
-    const sunGrad = ctx.createRadialGradient(320, 520, 0, 320, 520, 350);
-    sunGrad.addColorStop(0, 'rgba(255, 245, 205, 0.65)');
-    sunGrad.addColorStop(1, 'rgba(255, 245, 205, 0)');
-    ctx.fillStyle = sunGrad;
-    ctx.fillRect(0, 0, 1024, 1024);
-
-    const texture = createLinearClampTexture(gl);
-    gl.bindTexture(gl.TEXTURE_2D, texture);
-    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 0);
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, canvas);
-    return texture;
   }
 
   public setBackground(image: HTMLImageElement | HTMLCanvasElement): void {

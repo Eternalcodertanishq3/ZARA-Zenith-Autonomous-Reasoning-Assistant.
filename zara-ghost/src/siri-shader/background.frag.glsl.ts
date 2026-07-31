@@ -19,8 +19,7 @@ vec2 coverUv(vec2 screenUv, vec2 screenSize, vec2 texSize) {
 }
 
 vec4 fallbackBackground(vec2 uv) {
-    // Completely transparent fallback background — lets desktop background show through
-    return vec4(0.0);
+    return vec4(0.0, 0.0, 0.0, 0.0);
 }
 
 void main() {

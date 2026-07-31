@@ -7,41 +7,30 @@
   <link rel="stylesheet" href="/src/styles.css" />
 </head>
 <body>
-  <!-- WebGL2 canvas fills entire window — the glass shader handles everything -->
   <canvas id="siri-canvas"></canvas>
 
-  <!-- Pill overlay: DOM content rendered OVER the glass panel -->
   <div id="pill-overlay">
-    <!-- Idle hint -->
-    <div id="siri-hint">Click to ask · hold to speak</div>
-
-    <!-- Header (shown in expanded states) -->
     <div id="win-header">
       <div class="header-left">
         <div class="status-dot"></div>
-        <span id="task-label">IDLE</span>
+        <span id="task-label">ZARA</span>
       </div>
       <div class="header-right">
-        <button class="win-btn" onclick="minimize()">−</button>
-        <button class="win-btn" onclick="closeWindow()">×</button>
+        <button class="win-btn win-close" onclick="morphTo('idle')" title="Close">✕</button>
       </div>
     </div>
 
-    <!-- Content panels -->
     <div id="win-content">
-      
-      <!-- CHAT -->
       <div id="layout-chat" class="layout">
         <div class="chat-messages" id="chat-messages">
           <div class="msg bot">System initialized. Gemma 4B loaded. Ready.</div>
         </div>
         <div class="chat-input">
-          <input type="text" id="chat-input" placeholder="Say something..." onkeydown="if(event.key==='Enter')sendMessage()"/>
+          <input type="text" id="chat-input" placeholder="Ask ZARA anything..." onkeydown="if(event.key==='Enter')sendMessage()"/>
           <button onclick="sendMessage()">➤</button>
         </div>
       </div>
 
-      <!-- CODE -->
       <div id="layout-code" class="layout">
         <div class="code-sidebar">
           <div class="sidebar-title">FILES</div>
@@ -56,7 +45,6 @@
         </div>
       </div>
 
-      <!-- SYSTEM -->
       <div id="layout-system" class="layout">
         <div class="sys-grid">
           <div class="sys-card">
@@ -81,7 +69,6 @@
         </div>
       </div>
 
-      <!-- VISION -->
       <div id="layout-vision" class="layout">
         <div class="vision-cam">CAM</div>
         <div class="vision-text-wrap">
@@ -94,13 +81,19 @@
       </div>
     </div>
 
-    <!-- Corner Tabs -->
     <div id="corner-tabs">
-      <button class="tab tab-chat" onclick="morphTo('chat')" title="Chat">💬</button>
-      <button class="tab tab-code" onclick="morphTo('code')" title="Code">⚡</button>
-      <button class="tab tab-sys" onclick="morphTo('system')" title="System">◉</button>
-      <button class="tab tab-eye" onclick="morphTo('vision')" title="Vision">👁</button>
-      <button class="tab tab-close" onclick="morphTo('idle')" title="Minimize">✕</button>
+      <button class="tab tab-chat" onclick="morphTo('chat')" title="Chat">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      </button>
+      <button class="tab tab-code" onclick="morphTo('code')" title="Code">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+      </button>
+      <button class="tab tab-sys" onclick="morphTo('system')" title="System">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      </button>
+      <button class="tab tab-eye" onclick="morphTo('vision')" title="Vision">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+      </button>
     </div>
   </div>
 

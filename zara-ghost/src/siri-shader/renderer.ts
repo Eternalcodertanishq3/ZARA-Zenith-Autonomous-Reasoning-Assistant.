@@ -173,7 +173,7 @@ export class SiriRenderer {
     effectComposite: ProgramEntry;
     glassComposite: ProgramEntry;
   };
-  public container = { black: 0.25, fade: 1, gauss: 8, strength: 0.9 };
+  public container = { black: 0.12, fade: 0.6, gauss: 14, strength: 0.2 };
   public chipLenses = {
     rects: [[0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]] as number[][],
     states: [0, 0, 0],
@@ -288,7 +288,7 @@ export class SiriRenderer {
       panelSize: [panelWidth, panelHeight],
       margin,
       cornerRadius: cornerRadiusFor(coreWidth, coreHeight, answer, this.dpr),
-      containerStrength: this.container.strength * Math.min(1, Math.max(0, Math.max(surface.sharedResolved || 0, answer))),
+      containerStrength: this.container.strength * Math.min(1, Math.max(0, Math.max(surface.sharedResolved || 0, answer * 0.85))),
     };
   }
 
@@ -377,18 +377,18 @@ export class SiriRenderer {
         { name: 'uPanelOrigin', type: 'vec2', value: layout.panelOrigin },
         { name: 'uMarginPx', value: layout.margin },
         { name: 'uCornerRadius', value: layout.cornerRadius },
-        { name: 'uHeight', value: 18 * this.dpr },
+        { name: 'uHeight', value: 24 * this.dpr },
         { name: 'uCurvature', value: 1 },
-        { name: 'uRefractAmount', value: -56 * this.dpr },
+        { name: 'uRefractAmount', value: -80 * this.dpr },
         { name: 'uAngle', value: 0 },
-        { name: 'uGradRadialMix', value: 0.08 },
+        { name: 'uGradRadialMix', value: 0.15 },
         { name: 'uKeyAngle', value: Math.PI * 0.25 },
         { name: 'uFillAngle', value: Math.PI * 1.25 },
-        { name: 'uHlHeight', value: 2.2 * this.dpr },
+        { name: 'uHlHeight', value: 3.5 * this.dpr },
         { name: 'uHlCut', value: 0.52 },
         { name: 'uHlNorm', value: 8 },
-        { name: 'uHlAmount', value: 0.72 },
-        { name: 'uHlCurv', value: 1 },
+        { name: 'uHlAmount', value: 1.3 },
+        { name: 'uHlCurv', value: 0.85 },
         { name: 'uBackgroundReady', value: this.backgroundReady },
         { name: 'uTransparentOutside', value: 1 },
         { name: 'uChip0', type: 'vec4', value: this.chipLenses.rects[0] },

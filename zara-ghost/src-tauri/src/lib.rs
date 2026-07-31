@@ -14,20 +14,19 @@ async fn morph_window(window: WebviewWindow, task: String) {
     let center_x = screen_size.width / 2.0;
     let center_y = screen_size.height / 2.0;
 
-    let (w, h, x, y, click_through) = match task.as_str() {
-        // Glass orb needs full canvas for refraction pipeline
-        "idle"   => (500.0, 400.0, center_x - 250.0, center_y - 200.0, false),
-        "chat"   => (500.0, 400.0, center_x - 250.0, center_y - 200.0, false),
-        "code"   => (900.0, 520.0, center_x - 450.0, 160.0, false),
-        "system" => (500.0, 400.0, center_x - 250.0, center_y - 200.0, false),
-        "vision" => (700.0, 400.0, center_x - 350.0, center_y - 200.0, false),
-        "thinking" => (500.0, 400.0, center_x - 250.0, center_y - 200.0, false),
+    let (w, h, x, y) = match task.as_str() {
+        "idle"     => (500.0, 400.0, center_x - 250.0, center_y - 200.0),
+        "thinking" => (500.0, 400.0, center_x - 250.0, center_y - 200.0),
+        "chat"     => (520.0, 280.0, center_x - 260.0, center_y - 140.0),
+        "code"     => (860.0, 520.0, center_x - 430.0, center_y - 260.0),
+        "system"   => (480.0, 400.0, center_x - 240.0, center_y - 200.0),
+        "vision"   => (640.0, 220.0, center_x - 320.0, center_y - 110.0),
         _ => return,
     };
 
     let _ = window.set_size(Size::Logical(LogicalSize { width: w, height: h }));
     let _ = window.set_position(Position::Logical(LogicalPosition { x, y }));
-    let _ = window.set_ignore_cursor_events(click_through);
+    let _ = window.set_ignore_cursor_events(false);
 }
 
 #[tauri::command]

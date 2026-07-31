@@ -9,6 +9,14 @@ import sys
 import os
 from pathlib import Path
 from logging.handlers import RotatingFileHandler
+from datetime import datetime
+
+if sys.platform == "win32":
+    try:
+        sys.stdout.reconfigure(encoding='utf-8', errors='replace')
+        sys.stderr.reconfigure(encoding='utf-8', errors='replace')
+    except Exception:
+        pass
 
 # Custom logging levels
 SUCCESS = 25

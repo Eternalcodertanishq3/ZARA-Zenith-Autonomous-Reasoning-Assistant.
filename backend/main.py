@@ -24,6 +24,13 @@ import signal
 from datetime import datetime
 from typing import Optional
 
+if sys.platform == "win32":
+    try:
+        sys.stdout.reconfigure(encoding='utf-8', errors='replace')
+        sys.stderr.reconfigure(encoding='utf-8', errors='replace')
+    except Exception:
+        pass
+
 # 🚀 NEW: True Multiprocessing Imports
 from multiprocessing import Process, Queue, Event
 import queue  # For queue.Empty exception handling
@@ -95,36 +102,37 @@ from brain.multimodal_fusion import AdvancedMultimodalFusion, FusionEngine
 from brain.emotional_anchor import EmotionalAnchor
 
 # ═══════════════════════════════════════════════════════════════════
-# Phase III: Memory & Evolution (Enhanced with Goals & Consciousness)
+# ═══════════════════════════════════════════════════════════════════
+# Phase III: Memory System
 # ═══════════════════════════════════════════════════════════════════
 from memory.vector_db import VectorMemory, Memory
 from memory.context_compressor import ContextCompressor
-from evolution.ssl_trainer import get_consciousness
-from evolution.knowledge_ingest import get_knowledge
-from evolution.contextual_adapter import get_soul
-from evolution.autonomous_goals import get_goals
+# from evolution.ssl_trainer import get_consciousness
+# from evolution.knowledge_ingest import get_knowledge
+# from evolution.contextual_adapter import get_soul
+# from evolution.autonomous_goals import get_goals
 
 # ═══════════════════════════════════════════════════════════════════
 # Phase IV: Autonomy & Agency
 # ═══════════════════════════════════════════════════════════════════
-from agency.sandbox import Sandbox
-from evolution.self_coding import get_self_coder
-from agency.test_runner import TestRunner
-from agency.deployer import Deployer
+# from agency.sandbox import Sandbox
+# from agency.test_runner import TestRunner
+# from agency.deployer import Deployer
 
 # ═══════════════════════════════════════════════════════════════════
 # Phase VI: Expression & Action (The Armory)
 # ═══════════════════════════════════════════════════════════════════
 from soul.tts_engine import TTSEngine
 from soul.voice_stylizer import VoiceStylizer
-from avatar.renderer import AvatarRenderer
+# from avatar.renderer import AvatarRenderer
 from actions.skill_loader import get_skill_manager, get_skills_for_brain
+
 # ═══════════════════════════════════════════════════════════════════
 # Phase V: Guardian Security
 # ═══════════════════════════════════════════════════════════════════
 from guardian.integrity_monitor import GuardianMonitor
 from guardian.encryption import Encryptor
-from guardian.firewall_persona import FirewallPersona
+# from guardian.firewall_persona import FirewallPersona
 
 # ═══════════════════════════════════════════════════════════════════
 # Phase VII: System Management (Enhanced with Resource Intelligence)
@@ -133,37 +141,27 @@ from system.resource_intelligence import get_system
 from system.load_balancer import HybridLoadBalancer
 from system.vram_governor import VRAMGovernor
 from system.energy_saver import EnergySaver
-from pulse.heartbeat import HeartbeatProtocol
-from pulse.boredom_thread import BoredomThread
-from pulse.latency_buffer import LatencyBuffer
-from pulse.priority_interrupt import PriorityInterrupt
-from pulse.dream_processor import get_dreams
+# from pulse.heartbeat import HeartbeatProtocol
+# from pulse.boredom_thread import BoredomThread
+# from pulse.latency_buffer import LatencyBuffer
+# from pulse.priority_interrupt import PriorityInterrupt
+# from pulse.dream_processor import get_dreams
 
 # ═══════════════════════════════════════════════════════════════════
 # Phase IX-XII: Advanced Consciousness Systems (COMMENTED OUT FOR STABILITY & SPEED)
 # ═══════════════════════════════════════════════════════════════════
 # from soul.neuro_state import get_neurochemistry, Stimulus, StimulusType
 # from mind.intrinsic_motivation import get_motivation
-from mind.world_model import get_world_model, ActionType
-from mind.metacognition import get_metacognition
-
-# Mind Systems (Enhanced Cognition)
-from mind.system2_reasoner import get_system2_reasoner
-from mind.social_intelligence import get_social_intelligence
-from mind.empathy_engine import get_empathy_engine
-# from mind.meta_awareness import get_meta_awareness
-from mind.creative_synthesis import get_creative_synthesis
-from mind.dream_mode import get_dream_engine
-
-# Evolution & Learning
-# from evolution.self_evolution import get_evolution_engine
-from learning.continuous_learning import get_continuous_learner
-
-# Multi-Agent System
-from agency.hand_spawner import get_hand_spawner
-
-# Social
-from social.inner_circle import InnerCircle
+# from mind.world_model import get_world_model, ActionType
+# from mind.metacognition import get_metacognition
+# from mind.system2_reasoner import get_system2_reasoner
+# from mind.social_intelligence import get_social_intelligence
+# from mind.empathy_engine import get_empathy_engine
+# from mind.creative_synthesis import get_creative_synthesis
+# from mind.dream_mode import get_dream_engine
+# from learning.continuous_learning import get_continuous_learner
+# from agency.hand_spawner import get_hand_spawner
+# from social.inner_circle import InnerCircle
 
 # Unified Multimodal Perception
 from brain.unified_perception import get_unified_perception
@@ -174,7 +172,7 @@ from utils.async_loader import AsyncModelLoader
 from utils.resource_optimizer import get_optimizer, ResourceOptimizer
 
 # Dashboard (Native Desktop - No Browser Required)
-from dashboard.native_app import get_native_dashboard
+# from dashboard.native_app import get_native_dashboard
 
 # ═══════════════════════════════════════════════════════════════════
 # 🚀 ISOLATED SENSORY WORKERS (Prevents C-Level Crashes)
@@ -273,7 +271,7 @@ class ZaraConsciousness:
         self.vram_gov = None
         self.energy = None
         self.heartbeat = None
-        self.interrupts = PriorityInterrupt()  # Needed immediately for run_interactive
+        self.interrupts = None
         self.optimizer = None
         self.dashboard = None
         self.guardian = None
@@ -392,6 +390,8 @@ class ZaraConsciousness:
 
     def _register_heartbeats(self):
         """Register all modules for health monitoring."""
+        if not self.heartbeat:
+            return
         self.heartbeat.register_module("eyes", lambda: self.eyes is not None and getattr(self.eyes, 'running', False))
         self.heartbeat.register_module("ears", lambda: self.ears is not None and getattr(self.ears, 'is_listening', False))
         self.heartbeat.register_module("brain", lambda: self.brain is not None and getattr(self.brain, 'llm', None) is not None)
@@ -502,7 +502,7 @@ class ZaraConsciousness:
             self.degrader.mark_degraded("brain", str(e))
         
         self.emotion = EmotionalAnchor()
-        self.self_coder = get_self_coder(self.brain)
+        self.self_coder = None
         gc.collect()
         
         # Step 2: STT / Whisper (ISOLATED PROCESS)
@@ -584,59 +584,50 @@ class ZaraConsciousness:
                 self.degrader.mark_degraded(name, str(e))
                 return fallback
         
-        self.consciousness = _safe_init("consciousness", get_consciousness)
-        self.soul = _safe_init("soul", get_soul)
-        self.knowledge = _safe_init("knowledge", get_knowledge)
-        self.goals = _safe_init("goals", get_goals)
-        self.dreams = _safe_init("dreams", get_dreams)
+        self.consciousness = None
+        self.soul = None
+        self.knowledge = None
+        self.goals = None
+        self.dreams = None
         self.skill_manager = _safe_init("skill_manager", get_skill_manager)
         self.active_skills_prompt = _safe_init("skills_prompt", get_skills_for_brain, fallback="")
         self.resources = _safe_init("resources", get_system)
         self.balancer = _safe_init("balancer", HybridLoadBalancer)
         self.vram_gov = _safe_init("vram_governor", VRAMGovernor)
         self.energy = _safe_init("energy", EnergySaver)
-        self.heartbeat = _safe_init("heartbeat", HeartbeatProtocol)
+        self.heartbeat = None
         self.optimizer = _safe_init("optimizer", get_optimizer)
-        self.dashboard = _safe_init("dashboard", get_native_dashboard)
-        if self.dashboard:
-            try:
-                self.dashboard.zara = self
-            except Exception as e:
-                logger.error(f"  ✗ dashboard.zara link failed: {e}")
+        self.dashboard = None
         self.guardian = _safe_init("guardian", GuardianMonitor)
         self.encryption = _safe_init("encryption", Encryptor)
-        # self.firewall = _safe_init("firewall", lambda: FirewallPersona(alert_callback=self._security_alert))
+        self.firewall = None
         self.wake_word = _safe_init("wake_word", WakeWordDetector)
         self.face_id = _safe_init("face_id", FaceID)
         self.compressor = _safe_init("compressor", ContextCompressor)
         self.stylizer = _safe_init("stylizer", VoiceStylizer)
         self.fusion = _safe_init("fusion", lambda: self.fusion or AdvancedMultimodalFusion())
         self.voice_emotion = _safe_init("voice_emotion", lambda: self.voice_emotion or get_voice_analyzer())
-        self.sandbox = _safe_init("sandbox", Sandbox)
-        self.tester = _safe_init("tester", TestRunner)
-        self.deployer = _safe_init("deployer", Deployer)
-        self.boredom = _safe_init("boredom", lambda: BoredomThread(speak_callback=self._proactive_speak))
-        self.latency = _safe_init("latency", lambda: LatencyBuffer(speak_callback=self._say_filler))
-        # self.neurochemistry = _safe_init("neurochemistry", get_neurochemistry)
-        # self.motivation = _safe_init("motivation", get_motivation)
+        self.sandbox = None
+        self.tester = None
+        self.deployer = None
+        self.boredom = None
+        self.latency = None
         self.neurochemistry = None
         self.motivation = None
-        self.world_model = _safe_init("world_model", get_world_model)
-        self.metacognition = _safe_init("metacognition", get_metacognition)
-        self.system2 = _safe_init("system2", get_system2_reasoner)
-        self.social_intel = _safe_init("social_intel", get_social_intelligence)
-        self.empathy = _safe_init("empathy", get_empathy_engine)
-        # self.meta_awareness = _safe_init("meta_awareness", get_meta_awareness)
+        self.world_model = None
+        self.metacognition = None
+        self.system2 = None
+        self.social_intel = None
+        self.empathy = None
         self.meta_awareness = None
-        self.creative = _safe_init("creative", get_creative_synthesis)
-        self.dream_mode = _safe_init("dream_mode", get_dream_engine)
-        # self.self_evolution = _safe_init("self_evolution", get_evolution_engine)
+        self.creative = None
+        self.dream_mode = None
         self.self_evolution = None
-        self.continuous_learning = _safe_init("continuous_learning", get_continuous_learner)
-        self.hand_spawner = _safe_init("hand_spawner", get_hand_spawner)
-        self.inner_circle = _safe_init("inner_circle", InnerCircle)
+        self.continuous_learning = None
+        self.hand_spawner = None
+        self.inner_circle = None
         self.unified_perception = _safe_init("unified_perception", get_unified_perception)
-        self.avatar = _safe_init("avatar", AvatarRenderer)
+        self.avatar = None
         
         logger.info("  ✓ Subsystem initialization complete")
         
@@ -656,24 +647,26 @@ class ZaraConsciousness:
         # Start background services with error handling
         logger.info("Starting background services...")
         
-        _safe_start("heartbeat", self.heartbeat.start)
-        _safe_start("interrupts", self.interrupts.start_listener)
-        _safe_start("energy", self.energy.start_monitoring)
-        _safe_start("resources", self.resources.start)
-        # _safe_start("firewall", self.firewall.start_monitoring)
-        _safe_start("boredom", self.boredom.start)
-        # _safe_start("dreams", self.dreams.start)
+        if hasattr(self, 'heartbeat') and self.heartbeat:
+            _safe_start("heartbeat", self.heartbeat.start)
+        if hasattr(self, 'interrupts') and self.interrupts:
+            _safe_start("interrupts", self.interrupts.start_listener)
+        if hasattr(self, 'energy') and self.energy:
+            _safe_start("energy", self.energy.start_monitoring)
+        if hasattr(self, 'resources') and self.resources:
+            _safe_start("resources", self.resources.start)
+        if hasattr(self, 'boredom') and self.boredom:
+            _safe_start("boredom", self.boredom.start)
         
-        logger.info("  ⏭️ dashboard: SKIPPED (stability mode)")
-        if hasattr(self.consciousness, 'start_background_learning'):
+        if hasattr(self, 'consciousness') and self.consciousness and hasattr(self.consciousness, 'start_background_learning'):
             _safe_start("consciousness_learning", self.consciousness.start_background_learning)
-        if hasattr(self.knowledge, 'start_background_processing'):
+        if hasattr(self, 'knowledge') and self.knowledge and hasattr(self.knowledge, 'start_background_processing'):
             _safe_start("knowledge_processing", self.knowledge.start_background_processing)
         
-        # _safe_start("neurochemistry", self.neurochemistry.start)
-        # _safe_start("motivation", self.motivation.start)
-        _safe_start("metacognition", self.metacognition.start)
-        _safe_start("hand_spawner", self.hand_spawner.start)
+        if hasattr(self, 'metacognition') and self.metacognition and hasattr(self.metacognition, 'start'):
+            _safe_start("metacognition", self.metacognition.start)
+        if hasattr(self, 'hand_spawner') and self.hand_spawner and hasattr(self.hand_spawner, 'start'):
+            _safe_start("hand_spawner", self.hand_spawner.start)
         
         # Authentication (DISABLED — re-enable when ZARA is fully tested)
         # try:

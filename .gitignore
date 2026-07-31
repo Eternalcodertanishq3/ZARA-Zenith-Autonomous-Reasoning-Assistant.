@@ -1,0 +1,30 @@
+# Gitignore for ZARA Monorepo
+
+# Python Bytecode & Caches
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Large Generated File Listings
+git_files.txt
+git_files_utf8.txt
+project_tree.txt
+
+# Virtual Environments
+venv/
+.venv/
+env/
+
+# Build artifacts & logs
+node_modules/
+dist/
+target/
+logs/
+*.log
+
+# Sensitive files & local keys
+.env
+.zara_key
+*.key

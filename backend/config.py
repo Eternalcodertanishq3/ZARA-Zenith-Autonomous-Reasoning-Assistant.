@@ -34,11 +34,11 @@ PROMPT_FILE = BRAIN_DIR / "system_prompt.txt"
 
 # Ensure Directories Exist
 for dir_path in [BRAIN_DIR, EYES_DIR, EARS_DIR, SOUL_DIR, AVATAR_DIR, 
-                 IDENTITY_DIR, MEMORY_DIR, EVOLUTION_DIR, AGENCY_DIR,
-                 GUARDIAN_DIR, SYSTEM_DIR, PULSE_DIR, LOGS_DIR, GHOST_DIR,
+                 IDENTITY_DIR, MEMORY_DIR, AGENCY_DIR,
+                 GUARDIAN_DIR, SYSTEM_DIR, LOGS_DIR,
                  EYES_DIR / "snapshots", IDENTITY_DIR / "authorized_faces",
                  SOUL_DIR / "voice_samples", AVATAR_DIR / "model_v3",
-                 MEMORY_DIR / "chroma_db", EVOLUTION_DIR / "knowledge_base"]:
+                 MEMORY_DIR / "chroma_db"]:
     dir_path.mkdir(parents=True, exist_ok=True)
 
 # ============================================================================

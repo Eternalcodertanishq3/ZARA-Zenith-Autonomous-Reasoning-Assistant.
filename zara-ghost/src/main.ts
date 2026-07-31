@@ -105,27 +105,17 @@ function updateLayout(task: string): void {
 }
 
 // ═══════════════════════════════════════════════════════════════
-//  Press & drag interaction with strict hit-testing & click-outside close
+//  Instant Transform Back To Orb When Clicking Anywhere On Screen
 // ═══════════════════════════════════════════════════════════════
 
-function getOrbHit(e: MouseEvent): { dist: number; isInside: boolean } {
-  const rect = canvas.getBoundingClientRect();
-  const clickX = e.clientX - rect.left;
-  const clickY = e.clientY - rect.top;
-  const centerX = rect.width / 2;
-  const centerY = rect.height / 2;
-  const dx = clickX - centerX;
-  const dy = clickY - centerY;
-  const dist = Math.hypot(dx, dy);
-  const hitRadius = currentTask === 'idle' ? 68 : 120;
-  return { dist, isInside: dist <= hitRadius };
-}
+// 1. Loss of window focus -> Clicking anywhere outside ZARA's window on screen morphs back to orb!
+window.addEventListener('blur', () => {
+  if (currentTask !== 'idle') {
+    morphTo('idle');
+  }
+});
 
-let isPressed = false;
-let pressStartTime = 0;
-let pressTimeout: ReturnType<typeof setTimeout> | null = null;
-
-// Global listener: Click outside interactive elements in pill state -> morph back to orb
+// 2. Click on non-interactive area inside window -> morph back to orb!
 window.addEventListener('pointerdown', (e: PointerEvent) => {
   if (currentTask === 'idle') return;
 
@@ -143,11 +133,33 @@ window.addEventListener('pointerdown', (e: PointerEvent) => {
   }
 });
 
+// ═══════════════════════════════════════════════════════════════
+//  Press & drag interaction with strict orb hit-testing
+// ═══════════════════════════════════════════════════════════════
+
+function getOrbHit(e: MouseEvent): { dist: number; isInside: boolean } {
+  const rect = canvas.getBoundingClientRect();
+  const clickX = e.clientX - rect.left;
+  const clickY = e.clientY - rect.top;
+  const centerX = rect.width / 2;
+  const centerY = rect.height / 2;
+  const dx = clickX - centerX;
+  const dy = clickY - centerY;
+  const dist = Math.hypot(dx, dy);
+  // Strict hit radius: 60px in idle mode (exact orb radius)
+  const hitRadius = currentTask === 'idle' ? 60 : 120;
+  return { dist, isInside: dist <= hitRadius };
+}
+
+let isPressed = false;
+let pressStartTime = 0;
+let pressTimeout: ReturnType<typeof setTimeout> | null = null;
+
 canvas.addEventListener('pointerdown', (e: PointerEvent) => {
   const { isInside } = getOrbHit(e);
 
   if (currentTask === 'idle') {
-    if (!isInside) return;
+    if (!isInside) return; // Strict: Discard if click is outside the 60px orb radius!
   }
 
   isPressed = true;
@@ -156,6 +168,7 @@ canvas.addEventListener('pointerdown', (e: PointerEvent) => {
   try {
     canvas.setPointerCapture(e.pointerId);
   } catch {}
+
   canvas.style.cursor = 'grabbing';
 
   if (currentTask === 'idle') {
@@ -195,6 +208,7 @@ canvas.addEventListener('pointerup', (e: PointerEvent) => {
 });
 
 canvas.addEventListener('pointermove', (_e: PointerEvent) => {
+  // NO grab cursor on hover! Keep cursor default on hover, grabbing ONLY when holding down.
   canvas.style.cursor = isPressed ? 'grabbing' : 'default';
 
   if (isPressed) {

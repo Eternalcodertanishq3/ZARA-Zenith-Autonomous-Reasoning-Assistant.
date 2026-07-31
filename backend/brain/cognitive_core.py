@@ -135,12 +135,11 @@ class ConsciousMind:
         try:
             from config import MODELS
             brain_conf = MODELS.get("brain", {})
-            self.model_path = brain_conf.get("path", "brain/model.gguf")
-            self.n_ctx = brain_conf.get("n_ctx", 8192)
-            self.temperature = brain_conf.get("temperature", 0.7)
-            self.max_tokens = brain_conf.get("max_tokens", 600)
-            # Ollama model name
-            self.ollama_model = "zara-brain"
+            self.model_path = str(MODELS.get("brain", {}).get("path", "brain/model.gguf"))
+            self.n_ctx = MODELS.get("brain", {}).get("n_ctx", 8192)
+            self.temperature = MODELS.get("brain", {}).get("temperature", 0.7)
+            self.max_tokens = MODELS.get("brain", {}).get("max_tokens", 600)
+            self.ollama_model = MODELS.get("brain", {}).get("ollama_model", "gemma:2b")
         except ImportError:
             self.model_path = "brain/model.gguf"
             self.n_ctx = 8192

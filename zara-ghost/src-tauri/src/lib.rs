@@ -1,7 +1,8 @@
-use tauri::{WebviewWindow, Position, Size, LogicalSize, LogicalPosition};
+use tauri::{WebviewWindow, Position, Size, LogicalSize, LogicalPosition, Manager};
 
 #[tauri::command]
 async fn morph_window(window: WebviewWindow, task: String) {
+    let _ = window.set_shadow(false);
     let monitor = match window.current_monitor() {
         Ok(Some(m)) => m,
         _ => return,
@@ -35,6 +36,12 @@ fn start_drag(window: WebviewWindow) {
 pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_opener::init())
+        .setup(|app| {
+            if let Some(window) = app.get_webview_window("main") {
+                let _ = window.set_shadow(false);
+            }
+            Ok(())
+        })
         .invoke_handler(tauri::generate_handler![morph_window, start_drag])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

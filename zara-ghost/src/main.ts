@@ -112,7 +112,7 @@ function updateLayout(task: string): void {
 }
 
 // ═══════════════════════════════════════════════════════════════
-//  Click Outside Handling & Focus Blur
+//  Click Outside & Window Dragging Listeners
 // ═══════════════════════════════════════════════════════════════
 
 // 1. Loss of window focus -> Clicking anywhere outside ZARA's window on screen morphs back to orb!
@@ -136,8 +136,25 @@ window.addEventListener('pointerdown', (e: PointerEvent) => {
   morphTo('idle');
 });
 
+// 3. Make non-interactive areas of #pill-overlay (header, background) draggable!
+pillOverlay.addEventListener('pointerdown', (e: PointerEvent) => {
+  if (currentTask === 'idle') return;
+
+  const target = e.target as HTMLElement;
+  const isInteractive = target.closest('input') ||
+                        target.closest('textarea') ||
+                        target.closest('button') ||
+                        target.closest('.chip') ||
+                        target.closest('.file-item') ||
+                        target.closest('.chat-messages');
+
+  if (!isInteractive) {
+    tauriInvoke('start_drag');
+  }
+});
+
 // ═══════════════════════════════════════════════════════════════
-//  Press & drag interaction with strict orb hit-testing
+//  Press & drag interaction for orb (idle mode)
 // ═══════════════════════════════════════════════════════════════
 
 function getOrbHit(e: MouseEvent): { dist: number; isInside: boolean } {

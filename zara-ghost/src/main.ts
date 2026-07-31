@@ -112,7 +112,7 @@ function updateLayout(task: string): void {
 }
 
 // ═══════════════════════════════════════════════════════════════
-//  Instant Transform Back To Orb When Clicking Anywhere On Screen
+//  Click Outside Handling & Focus Blur
 // ═══════════════════════════════════════════════════════════════
 
 // 1. Loss of window focus -> Clicking anywhere outside ZARA's window on screen morphs back to orb!
@@ -122,22 +122,18 @@ window.addEventListener('blur', () => {
   }
 });
 
-// 2. Click on non-interactive area inside window -> morph back to orb!
+// 2. Click on canvas background outside #pill-overlay -> morph back to orb!
 window.addEventListener('pointerdown', (e: PointerEvent) => {
   if (currentTask === 'idle') return;
 
   const target = e.target as HTMLElement;
-  const isInteractive = target.closest('input') ||
-                        target.closest('textarea') ||
-                        target.closest('button') ||
-                        target.closest('.chip') ||
-                        target.closest('.file-item') ||
-                        target.closest('.chat-messages') ||
-                        target.closest('.sys-card');
-
-  if (!isInteractive) {
-    morphTo('idle');
+  // If click is inside the pill container, keep pill open!
+  if (target.closest('#pill-overlay')) {
+    return;
   }
+
+  // Clicked outside #pill-overlay -> morph back to orb!
+  morphTo('idle');
 });
 
 // ═══════════════════════════════════════════════════════════════

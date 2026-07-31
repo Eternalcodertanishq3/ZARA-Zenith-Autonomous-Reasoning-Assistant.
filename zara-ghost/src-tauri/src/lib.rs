@@ -3,29 +3,47 @@ use tauri::{WebviewWindow, Position, Size, LogicalSize, LogicalPosition, Manager
 #[tauri::command]
 async fn morph_window(window: WebviewWindow, task: String) {
     let _ = window.set_shadow(false);
-    let monitor = match window.current_monitor() {
-        Ok(Some(m)) => m,
-        _ => return,
-    };
     
-    let scale_factor = monitor.scale_factor();
-    let screen_size = monitor.size().to_logical::<f64>(scale_factor);
-
-    let center_x = screen_size.width / 2.0;
-    let center_y = screen_size.height / 2.0;
-
-    let (w, h, x, y) = match task.as_str() {
-        "idle"     => (200.0, 200.0, center_x - 100.0, center_y - 100.0),
-        "thinking" => (200.0, 200.0, center_x - 100.0, center_y - 100.0),
-        "chat"     => (520.0, 200.0, center_x - 260.0, center_y - 100.0),
-        "code"     => (820.0, 460.0, center_x - 410.0, center_y - 230.0),
-        "system"   => (520.0, 360.0, center_x - 260.0, center_y - 180.0),
-        "vision"   => (640.0, 240.0, center_x - 320.0, center_y - 120.0),
+    // Get current window position and size for adaptive position-preserving expansion
+    let current_pos = match window.outer_position() {
+        Ok(pos) => pos,
+        _ => return,
+    };
+    let current_size = match window.inner_size() {
+        Ok(s) => s,
         _ => return,
     };
 
-    let _ = window.set_size(Size::Logical(LogicalSize { width: w, height: h }));
-    let _ = window.set_position(Position::Logical(LogicalPosition { x, y }));
+    let scale_factor = match window.current_monitor() {
+        Ok(Some(m)) => m.scale_factor(),
+        _ => 1.0,
+    };
+
+    let cur_x = current_pos.x as f64 / scale_factor;
+    let cur_y = current_pos.y as f64 / scale_factor;
+    let cur_w = current_size.width as f64 / scale_factor;
+    let cur_h = current_size.height as f64 / scale_factor;
+
+    // Current center point of the orb/pill on screen
+    let center_x = cur_x + cur_w / 2.0;
+    let center_y = cur_y + cur_h / 2.0;
+
+    let (new_w, new_h) = match task.as_str() {
+        "idle"     => (200.0, 200.0),
+        "thinking" => (200.0, 200.0),
+        "chat"     => (520.0, 200.0),
+        "code"     => (820.0, 460.0),
+        "system"   => (520.0, 360.0),
+        "vision"   => (640.0, 240.0),
+        _ => return,
+    };
+
+    // Calculate new top-left so window center stays stationary in place on screen!
+    let new_x = center_x - new_w / 2.0;
+    let new_y = center_y - new_h / 2.0;
+
+    let _ = window.set_size(Size::Logical(LogicalSize { width: new_w, height: new_h }));
+    let _ = window.set_position(Position::Logical(LogicalPosition { x: new_x, y: new_y }));
     let _ = window.set_ignore_cursor_events(false);
 }
 

@@ -54,7 +54,7 @@ html, body {
   padding: 0 16px;
   flex-shrink: 0;
   opacity: 0;
-  transition: opacity 0.3s 0.15s;
+  transition: opacity 0.25s ease;
 }
 
 #pill-overlay.expanded #win-header {
@@ -86,7 +86,7 @@ html, body {
   flex: 1;
   overflow: hidden;
   opacity: 0;
-  transition: opacity 0.3s 0.2s;
+  transition: opacity 0.25s ease;
   position: relative;
   width: 100%;
   min-height: 0;

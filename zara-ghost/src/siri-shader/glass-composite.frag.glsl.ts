@@ -60,20 +60,17 @@ vec2 coverUv(vec2 screenUv, vec2 screenSize, vec2 texSize) {
     return (screenUv - 0.5) * scale + 0.5;
 }
 
-vec3 fallbackBackground(vec2 uv) {
-	float vignette = smoothstep(0.95, 0.12, distance(uv, vec2(0.5)));
-	vec3 top = vec3(0.015, 0.018, 0.022);
-	vec3 bottom = vec3(0.0, 0.0, 0.0);
-	return mix(bottom, top, 1.0 - uv.y) + vec3(0.02, 0.035, 0.055) * vignette;
+vec4 fallbackBackground(vec2 uv) {
+	return vec4(0.0);
 }
 
-vec3 sampleBackground(vec2 canvasUv) {
-	vec3 image = texture(uBackground, coverUv(canvasUv, uCanvasSize, uTextureSize)).rgb;
+vec4 sampleBackground(vec2 canvasUv) {
+	vec4 image = texture(uBackground, coverUv(canvasUv, uCanvasSize, uTextureSize));
 	return mix(fallbackBackground(canvasUv), image, clamp(uBackgroundReady, 0.0, 1.0));
 }
 
-vec3 sampleScene(vec2 canvasUv) {
-	return texture(uSceneTexture, vec2(canvasUv.x, 1.0 - canvasUv.y)).rgb;
+vec4 sampleScene(vec2 canvasUv) {
+	return texture(uSceneTexture, vec2(canvasUv.x, 1.0 - canvasUv.y));
 }
 
 float supercircleDistance(vec2 p, vec2 b, float n, vec2 param) {
@@ -171,47 +168,36 @@ vec4 glassFragment(vec2 pixel) {
 	vec2 halfSize = uPanelSize * 0.5 - vec2(uMarginPx);
 	vec2 p = (panelUv - vec2(0.5)) * uPanelSize;
 	float d = shapeDistance(p, halfSize, uCornerRadius);
-	float alpha = 1.0 - smoothstep(-1.0, 1.0, d);
-	if (alpha <= 0.001) return vec4(0.0);
+	float shapeMask = 1.0 - smoothstep(-1.0, 1.0, d);
+	if (shapeMask <= 0.001) return vec4(0.0);
 
 	vec2 grad = shapeGradient(p, halfSize, uCornerRadius, uGradRadialMix);
 	vec2 baseUv = (uPanelOrigin + panelUv * uPanelSize) / uCanvasSize;
 	vec2 rUv = clamp(refractedUv(baseUv, d, grad), vec2(0.0), vec2(1.0));
 
-	vec3 col = sampleScene(rUv);
-	col += vec3(highlightBand(d, grad) * uHlAmount);
+	vec4 sceneSample = sampleScene(rUv);
+	vec3 col = sceneSample.rgb;
+	float hl = highlightBand(d, grad) * uHlAmount;
+	col += vec3(hl);
 
-	vec4 chips[3] = vec4[3](uChip0, uChip1, uChip2);
-	for (int i = 0; i < 3; i++) {
-		float on = uChipState[i];
-		vec4 chip = chips[i];
-		if (on <= 0.001 || chip.z <= 0.5) continue;
-		vec2 cp = p - chip.xy;
-		float cr = min(chip.z, chip.w);
-		float cd = shapeDistance(cp, chip.zw, cr);
-		float ca = (1.0 - smoothstep(-1.0, 1.0, cd)) * on;
-		if (ca <= 0.001) continue;
-		vec2 cgrad = shapeGradient(cp, chip.zw, cr, 0.35);
-		float t = clamp(-cd / max(uChipHeight, 0.001), 0.0, 1.0);
-		float mag = 1.0 - refractionProfile(t, 1.0);
-		vec2 cUv = clamp(rUv + (uChipRefract * mag * cgrad) / uCanvasSize, vec2(0.0), vec2(1.0));
-		float hov = uChipHover[i];
-		vec3 chipCol = sampleScene(cUv);
-		chipCol = mix(chipCol, vec3(1.0), uChipFace * (1.0 + 1.5 * hov));
-		chipCol += vec3(highlightBand(cd, cgrad) * uChipHlAmount);
-		col = mix(col, chipCol, ca);
-	}
-	return vec4(col, alpha);
+	// Fresnel / glass edge opacity profile (translucent in center, solid on rim)
+	float distFromCenter = length(p) / max(min(halfSize.x, halfSize.y), 0.001);
+	float fresnel = pow(clamp(distFromCenter, 0.0, 1.0), 2.2);
+	float glassAlpha = mix(0.28, 0.85, fresnel) * shapeMask;
+	float finalAlpha = max(glassAlpha, sceneSample.a * shapeMask);
+	finalAlpha = clamp(finalAlpha + hl * 0.5, 0.0, 1.0);
+
+	return vec4(col, finalAlpha);
 }
 
 void main() {
 	vec2 pixel = vec2(gl_FragCoord.x, uResolution.y - gl_FragCoord.y);
 	vec2 canvasUv = pixel / uCanvasSize;
-	vec3 background = sampleBackground(canvasUv);
+	vec4 background = sampleBackground(canvasUv);
 	vec4 glass = glassFragment(pixel);
 	float a = saturate(glass.a);
 	vec3 glassRgb = clamp(glass.rgb, 0.0, 1.25);
-	vec4 framed = vec4(mix(background, glassRgb, a), 1.0);
+	vec4 framed = vec4(mix(background.rgb, glassRgb, a), 1.0);
 	vec4 floating = vec4(glassRgb * a, a);
 	outColor = mix(framed, floating, clamp(uTransparentOutside, 0.0, 1.0));
 }

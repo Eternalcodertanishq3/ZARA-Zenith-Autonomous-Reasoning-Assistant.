@@ -94,7 +94,7 @@ HARDWARE = {
 # ============================================================================
 MODELS = {
     "brain": {
-        "ollama_model": "gemma:2b",
+        "ollama_model": "qwen2.5:3b",
         "path": str(MODEL_FILE),
         "n_ctx": 8192,
         "n_gpu_layers": 20,  # Reduced from 35 to fit in 6GB VRAM

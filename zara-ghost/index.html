@@ -1,14 +1,94 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>ZARA AI</title>
-  </head>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ZARA Ghost</title>
+  <link rel="stylesheet" href="/src/styles.css" />
+</head>
+<body>
+  <main class="siri-page">
+    <canvas id="siri-canvas" class="siri-canvas"></canvas>
 
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
+    <div id="pill-overlay" class="pill-overlay">
+      <div class="pill-stack">
+        <!-- CHAT MODE -->
+        <form id="ask-form" class="ask-form on" autocomplete="off" onsubmit="event.preventDefault(); sendMessage();">
+          <input
+            id="ask-input"
+            type="text"
+            placeholder="Ask ZARA"
+            maxlength="200"
+            autocomplete="off"
+            autocapitalize="off"
+            spellcheck="false"
+            enterkeyhint="send"
+          />
+        </form>
+        <p id="answer-card" class="answer-card"><span id="answer-text"></span></p>
+
+        <!-- CODE MODE -->
+        <div id="layout-code" class="layout-panel">
+          <div class="code-sidebar">
+            <div class="sidebar-title">FILES</div>
+            <div class="file-item active">main.py</div>
+            <div class="file-item">cognitive_core.py</div>
+            <div class="file-item">config.py</div>
+          </div>
+          <div class="code-editor">
+            <div class="code-line"><span class="kw">def</span> <span class="fn">process</span>(input):</div>
+            <div class="code-line">    <span class="cm"># ZARA Cognitive Engine</span></div>
+            <div class="code-line">    <span class="kw">return</span> model.generate(input)</div>
+          </div>
+        </div>
+
+        <!-- SYSTEM MODE -->
+        <div id="layout-system" class="layout-panel">
+          <div class="sys-grid">
+            <div class="sys-card">
+              <div class="sys-label">CPU</div>
+              <div class="sys-value" id="cpu-val">28%</div>
+              <div class="sys-bar"><div class="sys-fill" id="cpu-fill" style="width:28%"></div></div>
+            </div>
+            <div class="sys-card">
+              <div class="sys-label">RAM</div>
+              <div class="sys-value" id="ram-val">54%</div>
+              <div class="sys-bar"><div class="sys-fill" id="ram-fill" style="width:54%"></div></div>
+            </div>
+            <div class="sys-card">
+              <div class="sys-label">GPU</div>
+              <div class="sys-value" id="gpu-val">31%</div>
+              <div class="sys-bar"><div class="sys-fill" id="gpu-fill" style="width:31%"></div></div>
+            </div>
+            <div class="sys-card">
+              <div class="sys-label">MODEL</div>
+              <div class="sys-value" style="font-size:13px; color:#38bdf8">Gemma 4B</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- VISION MODE -->
+        <div id="layout-vision" class="layout-panel">
+          <div class="vision-cam">CAM</div>
+          <div class="vision-text-wrap">
+            <div class="vision-title">Scene Analysis</div>
+            <div class="vision-desc" id="vision-text">Screen & camera stream active...</div>
+          </div>
+          <div class="vision-tags">
+            <span class="tag">Active</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4 State Mode Glass Buttons -->
+      <div id="ask-chips" class="ask-chips on">
+        <button type="button" class="chip chip-chat active" data-mode="chat">💬 Chat</button>
+        <button type="button" class="chip chip-code" data-mode="code">⚡ Code</button>
+        <button type="button" class="chip chip-system" data-mode="system">◉ System</button>
+        <button type="button" class="chip chip-vision" data-mode="vision">👁 Vision</button>
+      </div>
+    </div>
+  </main>
+  <script type="module" src="/src/main.ts"></script>
+</body>
 </html>

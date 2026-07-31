@@ -1,7 +1,10 @@
 import './styles.css';
 import { SiriRenderer } from './siri-shader/renderer';
 import { createSiriState } from './siri-shader/state';
-import type { AudioBands } from './siri-shader/state';
+import { AudioAnalyzer } from './siri-shader/audio-analyzer';
+import { createAskFlow } from './siri-shader/ask-flow';
+import { initChatMode } from './modes/chat';
+import { initSystemMode } from './modes/system';
 
 declare global {
   interface Window {
@@ -18,311 +21,263 @@ function tauriInvoke(cmd: string, args?: Record<string, unknown>): void {
 }
 
 // ═══════════════════════════════════════════════════════════════
-//  Task-specific pill sizes (Matching z1han exact proportions)
+//  Task-specific pill sizes
 // ═══════════════════════════════════════════════════════════════
 
 const TASK_SIZES: Record<string, { width: number; height: number }> = {
   chat:    { width: 480, height: 160 },
-  code:    { width: 780, height: 420 },
-  system:  { width: 480, height: 320 },
-  vision:  { width: 600, height: 200 },
+  code:    { width: 720, height: 380 },
+  system:  { width: 480, height: 280 },
+  vision:  { width: 560, height: 220 },
 };
 
+const MODE_CHIPS = ['💬 Chat', '⚡ Code', '◉ System', '👁 Vision'];
+
 // ═══════════════════════════════════════════════════════════════
-//  Global state
+//  Global state & modules
 // ═══════════════════════════════════════════════════════════════
 
-let currentTask = 'idle';
-let renderer: SiriRenderer | null = null;
+let currentTaskMode = 'chat';
+const canvas = document.getElementById('siri-canvas') as HTMLCanvasElement;
+const pillOverlay = document.getElementById('pill-overlay') as HTMLDivElement;
+
+const renderer = new SiriRenderer(canvas, 'bloom', true);
 const siriState = createSiriState();
-const bands: AudioBands = { low: 0, mid: 0, high: 0 };
+const audio = new AudioAnalyzer();
+
 let animationFrameId: number | null = null;
 let lastTimestamp = 0;
 
-// ═══════════════════════════════════════════════════════════════
-//  DOM references
-// ═══════════════════════════════════════════════════════════════
+const flow = createAskFlow({
+  siri: siriState,
+  renderer,
+  dom: {
+    form: document.getElementById('ask-form') as HTMLFormElement,
+    input: document.getElementById('ask-input') as HTMLInputElement,
+    chips: document.getElementById('ask-chips'),
+    card: document.getElementById('answer-card'),
+    text: document.getElementById('answer-text'),
+  },
+});
 
-const canvas = document.getElementById('siri-canvas') as HTMLCanvasElement;
-const pillOverlay = document.getElementById('pill-overlay') as HTMLDivElement;
-const taskLabel = document.getElementById('task-label') as HTMLSpanElement;
+const chatMode = initChatMode(
+  {
+    input: document.getElementById('ask-input') as HTMLInputElement,
+    messages: document.getElementById('answer-text'),
+  },
+  siriState
+);
 
-// ═══════════════════════════════════════════════════════════════
-//  Renderer setup
-// ═══════════════════════════════════════════════════════════════
+const systemMode = initSystemMode();
 
-try {
-  renderer = new SiriRenderer(canvas, 'bloom');
-} catch (e) {
-  console.error('WebGL2 init failed:', e);
+// Initialize 4 mode chips inside glass pill
+flow.setChips(MODE_CHIPS);
+
+// Attach explicit click listeners to all mode buttons
+function attachChipClickListeners(): void {
+  const chipButtons = document.querySelectorAll('.chip, .ask-chips button');
+  chipButtons.forEach((btn, index) => {
+    const modes = ['chat', 'code', 'system', 'vision'];
+    const mode = btn.getAttribute('data-mode') || modes[index] || 'chat';
+    
+    btn.addEventListener('pointerdown', (e) => e.stopPropagation());
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      e.preventDefault();
+      switchTaskMode(mode);
+    });
+  });
 }
 
-siriState.select('idle');
+attachChipClickListeners();
 
-// ═══════════════════════════════════════════════════════════════
-//  morphTo — state transitions with spring animation
-// ═══════════════════════════════════════════════════════════════
+function switchTaskMode(task: string): void {
+  currentTaskMode = task;
+  const size = TASK_SIZES[task] || TASK_SIZES.chat;
+  siriState.sizes.answer = { width: size.width, height: size.height };
+  flow.openAsk();
 
-function morphTo(task: string): void {
-  if (task === currentTask && task !== 'idle') return;
-  currentTask = task;
-
-  if (task === 'idle') {
-    siriState.select('idle');
-    pillOverlay.classList.remove('expanded');
-  } else if (task === 'thinking') {
-    siriState.select('thinking');
-    pillOverlay.classList.remove('expanded');
-  } else {
-    const size = TASK_SIZES[task] || TASK_SIZES.chat;
-    siriState.sizes.answer = { width: size.width, height: size.height };
-    siriState.select('answer');
-    pillOverlay.classList.add('expanded');
-    pillOverlay.style.width = `${size.width - 24}px`;
-    pillOverlay.style.height = `${size.height - 24}px`;
-  }
+  pillOverlay.classList.add('expanded');
+  pillOverlay.style.width = `${size.width - 24}px`;
+  pillOverlay.style.height = `${size.height - 24}px`;
 
   tauriInvoke('morph_window', { task });
-  updateLayout(task);
-}
 
-function updateLayout(task: string): void {
-  const isExpanded = task !== 'idle' && task !== 'thinking';
-  taskLabel.textContent = task === 'idle' ? 'ZARA' : 'Ask ZARA';
-
-  const layouts = document.querySelectorAll('.layout');
-  layouts.forEach((l) => {
-    (l as HTMLElement).style.display = 'none';
+  // Update active chip button
+  const buttons = document.querySelectorAll('.ask-chips button');
+  buttons.forEach((b) => {
+    if (b.getAttribute('data-mode') === task || b.textContent?.toLowerCase().includes(task)) {
+      b.classList.add('active');
+    } else {
+      b.classList.remove('active');
+    }
   });
 
-  if (isExpanded) {
-    const layoutId = `layout-${task}`;
-    const activeLayout = document.getElementById(layoutId);
-    if (activeLayout) {
-      activeLayout.style.display = 'flex';
-    }
-  }
+  // Toggle active class on layout panels
+  const askForm = document.getElementById('ask-form');
+  const answerCard = document.getElementById('answer-card');
+  const codeLayout = document.getElementById('layout-code');
+  const sysLayout = document.getElementById('layout-system');
+  const visLayout = document.getElementById('layout-vision');
 
-  // Update active chip state
-  const chips = document.querySelectorAll('.chip');
-  chips.forEach((c) => c.classList.remove('active'));
-  const targetClass = task === 'vision' ? 'chip-eye' : `chip-${task}`;
-  const activeChip = document.querySelector(`.${targetClass}`);
-  if (activeChip) activeChip.classList.add('active');
+  if (askForm) askForm.classList.toggle('on', task === 'chat');
+  if (answerCard) answerCard.classList.toggle('on', task === 'chat');
+  if (codeLayout) codeLayout.classList.toggle('on', task === 'code');
+  if (sysLayout) sysLayout.classList.toggle('on', task === 'system');
+  if (visLayout) visLayout.classList.toggle('on', task === 'vision');
+
+  if (task === 'system') {
+    systemMode.startMonitoring(({ cpu, ram, gpu }) => {
+      const cpuVal = document.getElementById('cpu-val');
+      const ramVal = document.getElementById('ram-val');
+      const gpuVal = document.getElementById('gpu-val');
+      if (cpuVal) cpuVal.textContent = `${cpu}%`;
+      if (ramVal) ramVal.textContent = `${ram}%`;
+      if (gpuVal) gpuVal.textContent = `${gpu}%`;
+      const cpuFill = document.getElementById('cpu-fill');
+      const ramFill = document.getElementById('ram-fill');
+      const gpuFill = document.getElementById('gpu-fill');
+      if (cpuFill) cpuFill.style.width = `${cpu}%`;
+      if (ramFill) ramFill.style.width = `${ram}%`;
+      if (gpuFill) gpuFill.style.width = `${gpu}%`;
+    });
+  } else {
+    systemMode.stopMonitoring();
+  }
 }
 
 // ═══════════════════════════════════════════════════════════════
-//  Click Outside & Window Dragging Listeners
+//  Window Blur & Focus
 // ═══════════════════════════════════════════════════════════════
 
-// 1. Loss of window focus -> Clicking anywhere outside ZARA's window on screen morphs back to orb!
 window.addEventListener('blur', () => {
-  if (currentTask !== 'idle') {
-    morphTo('idle');
+  if (flow.mode !== 'idle') {
+    flow.close();
+    tauriInvoke('morph_window', { task: 'idle' });
   }
 });
 
-// 2. Click on canvas background outside #pill-overlay -> morph back to orb!
-window.addEventListener('pointerdown', (e: PointerEvent) => {
-  if (currentTask === 'idle') return;
-
-  const target = e.target as HTMLElement;
-  // If click is inside the pill container, keep pill open!
-  if (target.closest('#pill-overlay')) {
-    return;
-  }
-
-  // Clicked outside #pill-overlay -> morph back to orb!
-  morphTo('idle');
-});
-
-// 3. Make non-interactive areas of #pill-overlay (header, background) draggable!
 pillOverlay.addEventListener('pointerdown', (e: PointerEvent) => {
-  if (currentTask === 'idle') return;
-
   const target = e.target as HTMLElement;
-  const isInteractive = target.closest('input') ||
-                        target.closest('textarea') ||
-                        target.closest('button') ||
-                        target.closest('.chip') ||
-                        target.closest('.file-item') ||
-                        target.closest('.chat-messages');
-
-  if (!isInteractive) {
+  if (!target.closest('input') && !target.closest('button')) {
     tauriInvoke('start_drag');
   }
 });
 
-// 4. Interactive 3D Parallax Tilt for expanded glass pill
-pillOverlay.addEventListener('pointermove', (e: PointerEvent) => {
-  if (currentTask === 'idle') return;
-  const rect = pillOverlay.getBoundingClientRect();
-  const x = (e.clientX - rect.left) / rect.width - 0.5;
-  const y = (e.clientY - rect.top) / rect.height - 0.5;
-  const rotateX = -y * 8;
-  const rotateY = x * 8;
-  pillOverlay.style.transform = `translate(-50%, -50%) perspective(1000px) rotateX(${rotateX.toFixed(2)}deg) rotateY(${rotateY.toFixed(2)}deg) scale(1.01)`;
-});
-
-pillOverlay.addEventListener('pointerleave', () => {
-  pillOverlay.style.transform = `translate(-50%, -50%) perspective(1000px) rotateX(0deg) rotateY(0deg) scale(1.0)`;
-});
-
 // ═══════════════════════════════════════════════════════════════
-//  Press & drag interaction for orb (idle mode)
+//  Hit testing & Glass interaction
 // ═══════════════════════════════════════════════════════════════
 
-function getOrbHit(e: MouseEvent): { dist: number; isInside: boolean } {
-  const rect = canvas.getBoundingClientRect();
-  const clickX = e.clientX - rect.left;
-  const clickY = e.clientY - rect.top;
-  const centerX = rect.width / 2;
-  const centerY = rect.height / 2;
-  const dx = clickX - centerX;
-  const dy = clickY - centerY;
-  const dist = Math.hypot(dx, dy);
-  const hitRadius = currentTask === 'idle' ? 60 : 120;
-  return { dist, isInside: dist <= hitRadius };
+function hitGlass(clientX: number, clientY: number): boolean {
+  const ballX = window.innerWidth * 0.5;
+  const ballY = window.innerHeight * 0.5;
+  const morph = Math.max(0, Math.min(1, siriState.surface.answer));
+  const pad = 26 * (1 - morph);
+  const base = siriState.sizes.expanded.width;
+  const pillW = Math.min(siriState.sizes.answer.width, window.innerWidth - 48);
+  const halfW = (base + (pillW - base) * morph) * 0.5 + pad;
+  const halfH = (base + (siriState.sizes.answer.height - base) * morph) * 0.5 + pad;
+  return Math.abs(clientX - ballX) <= halfW && Math.abs(clientY - ballY) <= halfH;
 }
 
-let isPressed = false;
-let pressStartTime = 0;
-let pressTimeout: ReturnType<typeof setTimeout> | null = null;
+let dragging = false;
+let pressedInside = false;
+let moved = false;
+let grabPointer = [0, 0];
+let longPressTimer = 0;
+let voiceHold = false;
+
+function startVoiceHold(): void {
+  longPressTimer = 0;
+  if (!dragging || moved || flow.mode !== 'idle') return;
+  voiceHold = true;
+  siriState.select('listening');
+  audio.start().catch(() => {});
+}
+
+function endVoiceHold(): void {
+  if (!voiceHold) return;
+  voiceHold = false;
+  audio.stop();
+  siriState.select('idle');
+}
 
 canvas.addEventListener('pointerdown', (e: PointerEvent) => {
-  const { isInside } = getOrbHit(e);
-
-  if (currentTask === 'idle') {
-    if (!isInside) return;
+  // Check if click target is a button, input, or inside pillOverlay
+  const hitTarget = document.elementFromPoint(e.clientX, e.clientY) as HTMLElement;
+  if (hitTarget && (hitTarget.closest('.chip') || hitTarget.closest('#pill-overlay') || hitTarget.tagName === 'BUTTON' || hitTarget.tagName === 'INPUT')) {
+    return; // Allow HTML click event to fire on the button!
   }
 
-  isPressed = true;
-  pressStartTime = performance.now();
-  siriState.setPressed(true);
-  try {
-    canvas.setPointerCapture(e.pointerId);
-  } catch {}
-
-  canvas.style.cursor = 'grabbing';
-
-  if (currentTask === 'idle') {
-    pressTimeout = setTimeout(() => {
-      if (isPressed) {
-        siriState.select('listening');
-      }
-    }, 500);
+  moved = false;
+  pressedInside = hitGlass(e.clientX, e.clientY);
+  grabPointer = [e.clientX, e.clientY];
+  if (pressedInside) {
+    dragging = true;
+    siriState.setPressed(true);
+    if (flow.mode === 'idle') {
+      longPressTimer = window.setTimeout(startVoiceHold, 450);
+    }
   }
 });
 
-canvas.addEventListener('pointerup', (e: PointerEvent) => {
-  const pressDuration = performance.now() - pressStartTime;
-  const { isInside } = getOrbHit(e);
-
-  isPressed = false;
-  siriState.setPressed(false);
-  try {
-    canvas.releasePointerCapture(e.pointerId);
-  } catch {}
-
-  canvas.style.cursor = 'default';
-
-  if (pressTimeout) {
-    clearTimeout(pressTimeout);
-    pressTimeout = null;
+canvas.addEventListener('pointermove', (e: PointerEvent) => {
+  if (!dragging) return;
+  const dx = e.clientX - grabPointer[0];
+  const dy = e.clientY - grabPointer[1];
+  if (!moved && Math.hypot(dx, dy) > 6) {
+    moved = true;
+    window.clearTimeout(longPressTimer);
+    longPressTimer = 0;
   }
-
-  if (siriState.state === 'listening') {
-    siriState.select('idle');
-    return;
-  }
-
-  if (pressDuration < 350 && currentTask === 'idle' && isInside) {
-    morphTo('chat');
-  }
-});
-
-canvas.addEventListener('pointermove', (_e: PointerEvent) => {
-  canvas.style.cursor = isPressed ? 'grabbing' : 'default';
-
-  if (isPressed) {
+  if (moved) {
     tauriInvoke('start_drag');
   }
 });
 
+function onRelease(e: PointerEvent): void {
+  const wasDragging = dragging;
+  dragging = false;
+  siriState.setPressed(false);
+  window.clearTimeout(longPressTimer);
+  longPressTimer = 0;
+  const wasVoice = voiceHold;
+  endVoiceHold();
+
+  if (!e || e.type !== 'pointerup') return;
+  if (wasVoice) return;
+  if (wasDragging && moved) return;
+
+  if (pressedInside) {
+    if (flow.mode === 'idle' || flow.mode === 'reply') {
+      switchTaskMode('chat');
+    } else if (flow.mode === 'thinking') {
+      flow.close();
+      tauriInvoke('morph_window', { task: 'idle' });
+    }
+  } else if (flow.mode !== 'idle') {
+    flow.close();
+    tauriInvoke('morph_window', { task: 'idle' });
+  }
+}
+
+canvas.addEventListener('pointerup', onRelease);
+canvas.addEventListener('pointercancel', onRelease);
+canvas.addEventListener('lostpointercapture', onRelease);
+
 // ═══════════════════════════════════════════════════════════════
-//  Chat backend
+//  Chat Backend
 // ═══════════════════════════════════════════════════════════════
 
 async function sendMessage(): Promise<void> {
-  const input = document.getElementById('chat-input') as HTMLInputElement;
-  const text = input.value.trim();
-  if (!text) return;
-  input.value = '';
-
-  addChatMessage(text, 'user');
-  siriState.select('thinking');
-
-  try {
-    const response = await fetch('http://127.0.0.1:11434/api/generate', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ model: 'gemma3:4b', prompt: text, stream: false }),
-    });
-
-    if (response.ok) {
-      const data = await response.json();
-      const burstDelay = siriState.conclude();
-      setTimeout(() => {
-        siriState.select('answer');
-        addChatMessage(data.response || 'No response.', 'bot');
-      }, burstDelay);
-    } else {
-      siriState.select('answer');
-      addChatMessage('Error: Could not reach model.', 'bot');
-    }
-  } catch {
-    siriState.select('answer');
-    addChatMessage('Error: Backend not available.', 'bot');
-  }
+  await chatMode.send();
 }
 
-function addChatMessage(text: string, sender: 'user' | 'bot'): void {
-  const messagesEl = document.getElementById('chat-messages');
-  if (!messagesEl) return;
-  const div = document.createElement('div');
-  div.className = `msg ${sender}`;
-  div.textContent = text;
-  messagesEl.appendChild(div);
-  messagesEl.scrollTop = messagesEl.scrollHeight;
-}
+(window as any).sendMessage = sendMessage;
+(window as any).getCurrentTaskMode = () => currentTaskMode;
 
 // ═══════════════════════════════════════════════════════════════
-//  System monitor
-// ═══════════════════════════════════════════════════════════════
-
-function updateSystemStats(): void {
-  if (currentTask !== 'system') return;
-  const cpu = Math.round(15 + Math.random() * 30);
-  const ram = Math.round(40 + Math.random() * 20);
-  const gpu = Math.round(10 + Math.random() * 25);
-
-  const cpuVal = document.getElementById('cpu-val');
-  const ramVal = document.getElementById('ram-val');
-  const gpuVal = document.getElementById('gpu-val');
-  if (cpuVal) cpuVal.textContent = `${cpu}%`;
-  if (ramVal) ramVal.textContent = `${ram}%`;
-  if (gpuVal) gpuVal.textContent = `${gpu}%`;
-
-  const fills = document.querySelectorAll('.sys-fill');
-  if (fills[0]) (fills[0] as HTMLElement).style.width = `${cpu}%`;
-  if (fills[1]) (fills[1] as HTMLElement).style.width = `${ram}%`;
-  if (fills[2]) (fills[2] as HTMLElement).style.width = `${gpu}%`;
-}
-
-setInterval(updateSystemStats, 2000);
-
-// ═══════════════════════════════════════════════════════════════
-//  Render loop
+//  Render Loop
 // ═══════════════════════════════════════════════════════════════
 
 function animate(timestamp: number): void {
@@ -330,29 +285,25 @@ function animate(timestamp: number): void {
   const dt = Math.min(0.1, (timestamp - (lastTimestamp || timestamp)) / 1000);
   lastTimestamp = timestamp;
 
-  siriState.tick(dt, bands);
+  const currentBands = audio.update(dt);
+  flow.tick(dt);
+  siriState.tick(dt, currentBands);
 
-  if (renderer && !renderer.error) {
-    renderer.render({
-      surface: siriState.surface,
-      progress: siriState.progress,
-      bands,
-      sizes: siriState.sizes,
-      dt,
-    });
-  }
+  renderer.render({
+    surface: siriState.surface,
+    progress: siriState.progress,
+    bands: currentBands,
+    sizes: siriState.sizes,
+    dt,
+  });
 }
 
 animationFrameId = requestAnimationFrame(animate);
 
-// ═══════════════════════════════════════════════════════════════
-//  Expose globals
-// ═══════════════════════════════════════════════════════════════
-
-(window as any).morphTo = morphTo;
-(window as any).sendMessage = sendMessage;
-
 window.addEventListener('beforeunload', () => {
   if (animationFrameId) cancelAnimationFrame(animationFrameId);
-  renderer?.dispose();
+  flow.dispose();
+  audio.stop();
+  systemMode.stopMonitoring();
+  renderer.dispose();
 });

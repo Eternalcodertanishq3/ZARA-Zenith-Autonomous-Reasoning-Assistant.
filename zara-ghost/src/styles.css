@@ -1,258 +1,289 @@
-* { margin: 0; padding: 0; box-sizing: border-box; outline: none !important; }
+:root {
+  color-scheme: dark;
+  background: transparent !important;
+}
 
 html, body {
-  background: transparent !important;
-  overflow: hidden;
-  font-family: 'Inter', -apple-system, system-ui, sans-serif;
-  user-select: none;
-  -webkit-user-select: none;
   width: 100vw;
   height: 100vh;
+  margin: 0;
+  padding: 0;
+  background: transparent !important;
+  overflow: hidden;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
-#siri-canvas {
+.siri-page {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 100vw;
+  height: 100vh;
+  background: transparent !important;
+  overflow: hidden;
+}
+
+.siri-canvas {
   position: fixed;
-  top: 0;
-  left: 0;
+  inset: 0;
+  display: block;
+  width: 100vw;
+  height: 100vh;
+  background: transparent !important;
+  touch-action: none;
+  cursor: default;
+  z-index: 1;
+}
+
+.pill-overlay {
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 10;
   width: 100%;
   height: 100%;
-  display: block;
-  cursor: default;
-  backdrop-filter: blur(10px) saturate(140%) brightness(1.05);
-}
-
-#pill-overlay {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%) perspective(1000px);
-  transform-style: preserve-3d;
-  pointer-events: none;
-  z-index: 10;
   display: flex;
   flex-direction: column;
+  justify-content: space-between;
+  padding: 14px 18px;
+  box-sizing: border-box;
   overflow: hidden;
-  border-radius: 28px;
-  opacity: 0;
-  transition: opacity 0.35s ease, width 0.4s cubic-bezier(0.4, 0, 0.2, 1), height 0.4s cubic-bezier(0.4, 0, 0.2, 1), transform 0.15s ease-out;
+  pointer-events: none;
 }
 
-#pill-overlay.expanded {
-  opacity: 1;
+.pill-overlay * {
   pointer-events: auto;
 }
 
-#pill-overlay * {
-  pointer-events: inherit;
-}
-
-#win-header {
-  width: 100%;
-  height: 36px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 16px;
-  flex-shrink: 0;
-  opacity: 0;
-  transition: opacity 0.25s ease;
-}
-
-#pill-overlay.expanded #win-header {
-  opacity: 1;
-}
-
-.header-left {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding-left: 32px;
-}
-
-#task-label {
-  color: rgba(255, 255, 255, 0.85);
-  font-size: 13px;
-  font-weight: 600;
-  letter-spacing: 0.02em;
-}
-
-#win-content {
-  flex: 1;
-  overflow: hidden;
-  opacity: 0;
-  transition: opacity 0.25s ease;
+.pill-stack {
   position: relative;
   width: 100%;
+  flex: 1;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  box-sizing: border-box;
   min-height: 0;
-  display: flex;
-  flex-direction: column;
+  pointer-events: none;
 }
 
-#pill-overlay.expanded #win-content {
-  opacity: 1;
-}
-
-.layout {
+.ask-form, .answer-card, .layout-panel {
+  grid-area: 1 / 1;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  font: 400 15px/1.45 system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+  letter-spacing: 0.1px;
+  color: #fff;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.4);
+  opacity: 0;
+  transition: opacity 0.25s ease;
+  pointer-events: none;
+  overflow: hidden;
+  box-sizing: border-box;
   display: none;
+}
+
+.ask-form.on {
+  opacity: 1;
+  transition: opacity 0.3s ease 0.1s;
+  pointer-events: auto;
+  display: block;
+}
+
+.answer-card.on {
+  opacity: 1;
+  transition: opacity 0.3s ease 0.1s;
+  pointer-events: auto;
+  display: block;
+}
+
+#layout-code.on {
+  opacity: 1;
+  pointer-events: auto;
+  display: flex;
+}
+
+#layout-system.on {
+  opacity: 1;
+  pointer-events: auto;
+  display: grid;
+}
+
+#layout-vision.on {
+  opacity: 1;
+  pointer-events: auto;
+  display: flex;
+}
+
+.ask-form input {
+  width: 100%;
+  background: none;
+  border: 0;
+  outline: none;
+  padding: 0 4px;
+  margin: 0;
+  font: inherit;
+  letter-spacing: inherit;
+  color: #fff;
+  caret-color: #fff;
+  text-shadow: inherit;
+  box-sizing: border-box;
+  pointer-events: auto;
+}
+
+.ask-form input::placeholder {
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.answer-card {
+  max-height: var(--answer-max, 104px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: none;
+  --fade-top: 0px;
+  --fade-bottom: 0px;
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    transparent 0,
+    #000 var(--fade-top),
+    #000 calc(100% - var(--fade-bottom)),
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    transparent 0,
+    #000 var(--fade-top),
+    #000 calc(100% - var(--fade-bottom)),
+    transparent 100%
+  );
+  pointer-events: auto;
+}
+
+.answer-card::-webkit-scrollbar {
+  display: none;
+}
+
+#answer-text {
+  display: block;
+}
+
+.answer-card .reveal {
+  opacity: 0;
+  animation: answer-reveal 0.5s ease-out forwards;
+}
+
+@keyframes answer-reveal {
+  from {
+    opacity: 0;
+    filter: blur(7px);
+  }
+  to {
+    opacity: 1;
+    filter: blur(0);
+  }
+}
+
+/* CODE MODE PANEL */
+#layout-code {
+  gap: 10px;
+  padding: 2px;
   width: 100%;
   height: 100%;
   overflow: hidden;
 }
 
-/* CHAT */
-#layout-chat {
-  flex-direction: column;
-  padding: 4px 16px 8px;
-  gap: 8px;
-}
-
-.chat-input-wrap {
-  display: flex;
-  width: 100%;
-}
-
-.chat-input-wrap input {
-  width: 100%;
-  background: transparent;
-  border: none;
-  color: #ffffff;
-  font-size: 13px;
-  font-weight: 400;
-  outline: none;
-}
-
-.chat-input-wrap input::placeholder {
-  color: rgba(255, 255, 255, 0.4);
-}
-
-.chat-messages {
-  flex: 1;
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  min-height: 0;
-}
-
-.msg {
-  max-width: 88%;
-  padding: 6px 10px;
-  border-radius: 10px;
-  font-size: 11px;
-  line-height: 1.4;
-  color: rgba(255,255,255,0.85);
-  animation: msgIn 0.25s ease-out;
-}
-
-@keyframes msgIn {
-  from { opacity: 0; transform: translateY(4px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-.msg.bot {
-  align-self: flex-start;
-  background: rgba(255,255,255,0.06);
-  border-radius: 10px 10px 10px 3px;
-}
-
-.msg.user {
-  align-self: flex-end;
-  background: rgba(56,189,248,0.15);
-  color: #e0f2fe;
-  border-radius: 10px 10px 3px 10px;
-}
-
-/* CODE */
-#layout-code {
-  display: none;
-  padding: 8px 14px;
-  gap: 10px;
-}
-
 .code-sidebar {
-  width: 130px;
+  width: 120px;
   flex-shrink: 0;
-  background: rgba(0,0,0,0.25);
+  background: rgba(0,0,0,0.35);
   border-radius: 10px;
   padding: 8px;
+  overflow: hidden;
 }
 
 .sidebar-title {
-  color: rgba(255,255,255,0.3);
-  font-size: 9px;
-  letter-spacing: 0.12em;
+  color: rgba(255,255,255,0.4);
+  font-size: 10px;
+  letter-spacing: 0.1em;
   margin-bottom: 6px;
+  font-weight: 600;
 }
 
 .file-item {
-  color: rgba(255,255,255,0.4);
+  color: rgba(255,255,255,0.6);
   font-size: 11px;
   padding: 4px 6px;
-  border-radius: 5px;
+  border-radius: 6px;
   cursor: pointer;
-  transition: all 0.15s;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  pointer-events: auto;
 }
 
-.file-item:hover, .file-item.active {
-  background: rgba(56,189,248,0.12);
+.file-item.active {
+  background: rgba(56,189,248,0.18);
   color: #38bdf8;
+  font-weight: 500;
 }
 
 .code-editor {
   flex: 1;
-  background: rgba(0,0,0,0.25);
+  background: rgba(0,0,0,0.35);
   border-radius: 10px;
-  padding: 10px;
-  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  padding: 8px 12px;
+  font-family: 'JetBrains Mono', monospace;
   font-size: 11px;
-  line-height: 1.6;
-  color: rgba(255,255,255,0.8);
+  line-height: 1.5;
+  color: rgba(255,255,255,0.85);
   overflow: auto;
 }
 
 .kw { color: #c084fc; }
-.cm { color: rgba(255,255,255,0.25); }
+.cm { color: rgba(255,255,255,0.3); }
 
-/* SYSTEM */
+/* SYSTEM MODE PANEL */
 #layout-system {
-  display: none;
-  padding: 10px 14px;
-}
-
-.sys-grid {
-  display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 8px;
+  gap: 6px;
+  width: 100%;
   height: 100%;
+  overflow: hidden;
+  padding: 2px;
 }
 
 .sys-card {
-  background: rgba(255,255,255,0.03);
-  border-radius: 12px;
-  padding: 10px;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 10px;
+  padding: 6px 8px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 4px;
+  gap: 2px;
+  overflow: hidden;
 }
 
 .sys-label {
-  color: rgba(255,255,255,0.3);
+  color: rgba(255, 255, 255, 0.45);
   font-size: 9px;
-  letter-spacing: 0.12em;
+  font-weight: 700;
+  letter-spacing: 0.08em;
 }
 
 .sys-value {
-  color: rgba(255,255,255,0.85);
-  font-size: 18px;
+  color: #fff;
+  font-size: 14px;
   font-weight: 700;
 }
 
 .sys-bar {
-  width: 80%;
+  width: 85%;
   height: 3px;
-  background: rgba(255,255,255,0.05);
+  background: rgba(255, 255, 255, 0.12);
   border-radius: 2px;
   overflow: hidden;
 }
@@ -260,86 +291,99 @@ html, body {
 .sys-fill {
   height: 100%;
   background: #38bdf8;
-  transition: width 0.5s ease;
+  transition: width 0.4s ease;
 }
 
-/* VISION */
+/* VISION MODE PANEL */
 #layout-vision {
-  display: none;
-  padding: 10px 14px;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  padding: 4px;
 }
 
 .vision-cam {
-  width: 64px;
-  height: 44px;
-  background: rgba(0,0,0,0.3);
+  width: 54px;
+  height: 38px;
+  background: rgba(0,0,0,0.4);
   border-radius: 8px;
-  border: 1px solid rgba(255,255,255,0.06);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: rgba(255,255,255,0.25);
+  color: #38bdf8;
   font-size: 9px;
+  font-weight: 700;
   flex-shrink: 0;
+  border: 1px solid rgba(56,189,248,0.3);
 }
 
 .vision-title {
-  color: rgba(255,255,255,0.85);
+  color: #fff;
   font-size: 12px;
   font-weight: 600;
-  margin-bottom: 2px;
 }
 
 .vision-desc {
-  color: rgba(255,255,255,0.4);
-  font-size: 11px;
-  line-height: 1.4;
+  color: rgba(255,255,255,0.5);
+  font-size: 10px;
 }
 
-/* Mode Chips (matching z1han chip buttons) */
-#mode-chips {
+.vision-tags .tag {
+  background: rgba(56,189,248,0.16);
+  color: #38bdf8;
+  font-size: 9px;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+/* ASK CHIPS (4 Mode Buttons) */
+.ask-chips {
+  width: 100%;
   display: flex;
+  gap: 6px;
+  justify-content: space-between;
   align-items: center;
-  gap: 8px;
-  padding: 0 16px 12px;
-  margin-top: auto;
-  opacity: 0;
-  transition: opacity 0.3s 0.2s;
-}
-
-#pill-overlay.expanded #mode-chips {
   opacity: 1;
+  pointer-events: auto !important;
+  flex-shrink: 0;
+  margin-top: auto;
+  padding-top: 6px;
+  position: relative;
+  z-index: 100;
 }
 
-.chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  padding: 5px 13px;
-  border-radius: 18px;
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  background: rgba(255, 255, 255, 0.08);
+.ask-chips button, .chip {
+  flex: 1;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font: 500 12px/1 system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+  letter-spacing: 0.1px;
   color: rgba(255, 255, 255, 0.85);
-  font-size: 11px;
-  font-weight: 500;
-  cursor: pointer;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+  padding: 7px 10px;
+  border-radius: 999px;
+  border: 0;
+  cursor: pointer !important;
+  background: transparent;
+  white-space: nowrap;
+  text-align: center;
   transition: all 0.2s ease;
-  backdrop-filter: blur(8px);
+  pointer-events: auto !important;
+  position: relative;
+  z-index: 101;
 }
 
-.chip:hover {
-  background: rgba(255, 255, 255, 0.16);
-  border-color: rgba(255, 255, 255, 0.3);
-  transform: translateY(-1px);
+.ask-chips button:hover, .chip:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
 }
 
-.chip-chat.active { color: #38bdf8; border-color: rgba(56, 189, 248, 0.4); background: rgba(56, 189, 248, 0.16); }
-.chip-code.active { color: #c084fc; border-color: rgba(192, 132, 252, 0.4); background: rgba(192, 132, 252, 0.16); }
-.chip-sys.active { color: #a3e635; border-color: rgba(163, 230, 53, 0.4); background: rgba(163, 230, 53, 0.16); }
-.chip-eye.active { color: #fbbf24; border-color: rgba(251, 191, 36, 0.4); background: rgba(251, 191, 36, 0.16); }
-
-::-webkit-scrollbar { width: 3px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 3px; }
+.ask-chips button.active, .chip.active {
+  color: #ffffff;
+  font-weight: 600;
+  background: rgba(255, 255, 255, 0.15);
+  text-shadow: 0 0 8px rgba(255, 255, 255, 0.8);
+}

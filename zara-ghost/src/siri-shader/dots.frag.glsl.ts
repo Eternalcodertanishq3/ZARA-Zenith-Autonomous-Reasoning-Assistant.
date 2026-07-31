@@ -155,7 +155,20 @@ void main() {
 		float ti = float(i) * 0.363636374;
 		vec3 hue = spectrumTri(ti);
 		vec2 aberOff = vec2(-(aberStep * float(i)));
-		float field = dotsField(P, aberOff, centersA, centersB, dirs, radii, psOn, smOn, uPairSmoothness, uSmoothness, uPairSmoothness * 0.25, uSmoothness * 0.25);
+		float field = dotsField(
+			P,
+			aberOff,
+			centersA,
+			centersB,
+			dirs,
+			radii,
+			psOn,
+			smOn,
+			uPairSmoothness,
+			uSmoothness,
+			uPairSmoothness * 0.25,
+			uSmoothness * 0.25
+		);
 		float fm = max(field, 0.0);
 		float glow = saturate(uGlowIntensity / pow(fm + 0.0001, uFalloffPower));
 		float fadeT = clamp((fm - uGlowFadeStart) / fadeRange, 0.0, 1.0);
@@ -164,7 +177,20 @@ void main() {
 		wSum += hue;
 	}
 
-	float cfield = dotsField(P, vec2(0.0), centersA, centersB, dirs, radii, psOn, smOn, uPairSmoothness, uSmoothness, uPairSmoothness * 0.25, uSmoothness * 0.25);
+	float cfield = dotsField(
+		P,
+		vec2(0.0),
+		centersA,
+		centersB,
+		dirs,
+		radii,
+		psOn,
+		smOn,
+		uPairSmoothness,
+		uSmoothness,
+		uPairSmoothness * 0.25,
+		uSmoothness * 0.25
+	);
 	vec3 col = colAcc / max(wSum, vec3(0.0001));
 	float cfm = max(cfield, 0.0);
 	float cglow = saturate(uGlowIntensity / pow(cfm + 0.0001, uFalloffPower));

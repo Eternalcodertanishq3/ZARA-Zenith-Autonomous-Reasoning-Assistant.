@@ -193,10 +193,12 @@ export function createSiriState(): SiriState {
   }
 
   return {
-    sizes: { expanded: { width: EXPANDED_WIDTH }, answer: { width: 460, height: 150 } },
+    sizes: { expanded: { width: EXPANDED_WIDTH }, answer: { width: 480, height: 160 } },
     surface,
     progress,
-    get state() { return state; },
+    get state() {
+      return state;
+    },
 
     select(name: string) {
       const preset = STATE_PRESETS[name];

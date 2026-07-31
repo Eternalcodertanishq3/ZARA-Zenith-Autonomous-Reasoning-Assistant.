@@ -153,6 +153,21 @@ pillOverlay.addEventListener('pointerdown', (e: PointerEvent) => {
   }
 });
 
+// 4. Interactive 3D Parallax Tilt for expanded glass pill
+pillOverlay.addEventListener('pointermove', (e: PointerEvent) => {
+  if (currentTask === 'idle') return;
+  const rect = pillOverlay.getBoundingClientRect();
+  const x = (e.clientX - rect.left) / rect.width - 0.5;
+  const y = (e.clientY - rect.top) / rect.height - 0.5;
+  const rotateX = -y * 8;
+  const rotateY = x * 8;
+  pillOverlay.style.transform = `translate(-50%, -50%) perspective(1000px) rotateX(${rotateX.toFixed(2)}deg) rotateY(${rotateY.toFixed(2)}deg) scale(1.01)`;
+});
+
+pillOverlay.addEventListener('pointerleave', () => {
+  pillOverlay.style.transform = `translate(-50%, -50%) perspective(1000px) rotateX(0deg) rotateY(0deg) scale(1.0)`;
+});
+
 // ═══════════════════════════════════════════════════════════════
 //  Press & drag interaction for orb (idle mode)
 // ═══════════════════════════════════════════════════════════════

@@ -25,7 +25,8 @@ html, body {
   position: fixed;
   top: 50%;
   left: 50%;
-  transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%) perspective(1000px);
+  transform-style: preserve-3d;
   pointer-events: none;
   z-index: 10;
   display: flex;
@@ -33,7 +34,7 @@ html, body {
   overflow: hidden;
   border-radius: 28px;
   opacity: 0;
-  transition: opacity 0.35s ease, width 0.4s cubic-bezier(0.4, 0, 0.2, 1), height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: opacity 0.35s ease, width 0.4s cubic-bezier(0.4, 0, 0.2, 1), height 0.4s cubic-bezier(0.4, 0, 0.2, 1), transform 0.15s ease-out;
 }
 
 #pill-overlay.expanded {
@@ -68,17 +69,23 @@ html, body {
 }
 
 .status-dot {
-  width: 6px;
-  height: 6px;
+  width: 10px;
+  height: 10px;
   border-radius: 50%;
-  background: #38bdf8;
-  box-shadow: 0 0 8px #38bdf8;
+  background: radial-gradient(circle at 30% 30%, #38bdf8, #818cf8);
+  box-shadow: 0 0 10px rgba(56, 189, 248, 0.8), 0 0 20px rgba(129, 140, 248, 0.5);
+  animation: miniOrbPulse 2.5s infinite ease-in-out;
+}
+
+@keyframes miniOrbPulse {
+  0%, 100% { transform: scale(1); opacity: 0.9; }
+  50% { transform: scale(1.15); opacity: 1; box-shadow: 0 0 14px rgba(56, 189, 248, 1), 0 0 25px rgba(129, 140, 248, 0.8); }
 }
 
 #task-label {
-  color: rgba(255, 255, 255, 0.8);
+  color: rgba(255, 255, 255, 0.85);
   font-size: 13px;
-  font-weight: 500;
+  font-weight: 600;
   letter-spacing: 0.02em;
 }
 

@@ -74,16 +74,12 @@ function morphTo(task: string): void {
     siriState.select('thinking');
     pillOverlay.classList.remove('expanded');
   } else {
-    // Set task-specific pill size BEFORE selecting answer
     const size = TASK_SIZES[task] || TASK_SIZES.chat;
     siriState.sizes.answer = { width: size.width, height: size.height };
     siriState.select('answer');
-    // Delay DOM overlay reveal to let glass morph start
-    setTimeout(() => {
-      pillOverlay.classList.add('expanded');
-      pillOverlay.style.width = `${size.width - 40}px`;
-      pillOverlay.style.height = `${size.height - 40}px`;
-    }, 80);
+    pillOverlay.classList.add('expanded');
+    pillOverlay.style.width = `${size.width - 24}px`;
+    pillOverlay.style.height = `${size.height - 24}px`;
   }
 
   tauriInvoke('morph_window', { task });
@@ -133,37 +129,7 @@ canvas.addEventListener('click', (e: MouseEvent) => {
 });
 
 // ═══════════════════════════════════════════════════════════════
-//  Desktop Screen Capture Integration for Real Refraction
-// ═══════════════════════════════════════════════════════════════
-
-let isCapturingDesktop = false;
-async function captureDesktopBackground(): Promise<void> {
-  if (isCapturingDesktop || !renderer) return;
-  isCapturingDesktop = true;
-  try {
-    const rawBytes = await window.__TAURI__?.core?.invoke('capture_desktop') as number[];
-    if (rawBytes && renderer && rawBytes.length > 0) {
-      const w = canvas.width;
-      const h = canvas.height;
-      const imageData = new ImageData(new Uint8ClampedArray(rawBytes), w, h);
-      renderer.setBackgroundData(imageData);
-    }
-  } catch {
-  } finally {
-    isCapturingDesktop = false;
-  }
-}
-
-// Initial capture after window position settles
-setTimeout(captureDesktopBackground, 150);
-setInterval(() => {
-  if (currentTask === 'idle') {
-    captureDesktopBackground();
-  }
-}, 1000);
-
-// ═══════════════════════════════════════════════════════════════
-//  Press & drag interaction with strict orb hit-testing
+//  Press & drag interaction with strict orb hit-testing & pass-through
 // ═══════════════════════════════════════════════════════════════
 
 function getOrbHit(e: MouseEvent): { dist: number; isInside: boolean } {
@@ -175,19 +141,20 @@ function getOrbHit(e: MouseEvent): { dist: number; isInside: boolean } {
   const dx = clickX - centerX;
   const dy = clickY - centerY;
   const dist = Math.hypot(dx, dy);
-  const hitRadius = currentTask === 'idle' ? 68 : 100;
+  const hitRadius = currentTask === 'idle' ? 64 : 100;
   return { dist, isInside: dist <= hitRadius };
 }
 
 let isPressed = false;
 let pressStartTime = 0;
 let pressTimeout: ReturnType<typeof setTimeout> | null = null;
+let isIgnoringCursor = false;
 
 canvas.addEventListener('pointerdown', (e: PointerEvent) => {
   const { isInside } = getOrbHit(e);
 
   if (currentTask === 'idle') {
-    if (!isInside) return; // Ignore completely if pointer is outside the orb!
+    if (!isInside) return;
   } else {
     const rect = canvas.getBoundingClientRect();
     const dx = e.clientX - rect.left - rect.width / 2;
@@ -241,14 +208,25 @@ canvas.addEventListener('pointermove', (e: PointerEvent) => {
   const { isInside } = getOrbHit(e);
 
   if (currentTask === 'idle') {
-    canvas.style.cursor = isInside ? (isPressed ? 'grabbing' : 'grab') : 'default';
+    if (isInside) {
+      canvas.style.cursor = isPressed ? 'grabbing' : 'grab';
+      if (isIgnoringCursor) {
+        isIgnoringCursor = false;
+        tauriInvoke('set_ignore_cursor', { ignore: false });
+      }
+    } else {
+      canvas.style.cursor = 'default';
+      if (!isIgnoringCursor && !isPressed) {
+        isIgnoringCursor = true;
+        tauriInvoke('set_ignore_cursor', { ignore: true });
+      }
+    }
   } else {
     canvas.style.cursor = 'default';
   }
 
   if (isPressed && currentTask === 'idle') {
     tauriInvoke('start_drag');
-    captureDesktopBackground();
   }
 });
 

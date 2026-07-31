@@ -749,27 +749,32 @@ class ZaraConsciousness:
         Now with full consciousness integration.
         """
         # Record activity
-        self.energy.record_interaction()
-        self.boredom.record_user_activity()
-        self.dreams.record_wakefulness()
+        if hasattr(self, 'energy') and self.energy:
+            self.energy.record_interaction()
+        if hasattr(self, 'boredom') and self.boredom:
+            self.boredom.record_user_activity()
+        if hasattr(self, 'dreams') and self.dreams:
+            self.dreams.record_wakefulness()
         
         # ═══════════════════════════════════════════════════════════
-        # Phase 9-12: Consciousness Processing
+        # Phase 9-12: Consciousness Processing (Commented Out for Speed)
         # ═══════════════════════════════════════════════════════════
         
         # Process through neurochemistry (user interaction stimulus)
-        self.neurochemistry.process_stimulus(Stimulus(
-            type=StimulusType.USER_INTERACTION,
-            intensity=0.6,
-            context={"input": user_input[:100]}
-        ))
+        if hasattr(self, 'neurochemistry') and self.neurochemistry:
+            self.neurochemistry.process_stimulus(Stimulus(
+                type=StimulusType.USER_INTERACTION,
+                intensity=0.6,
+                context={"input": user_input[:100]}
+            ))
         
         # Broadcast to consciousness via metacognition
-        self.metacognition.broadcast_perception(user_input, source="ears")
+        if hasattr(self, 'metacognition') and self.metacognition:
+            self.metacognition.broadcast_perception(user_input, source="ears")
         
         # Get current mood vector for response modulation
-        mood_vector = self.neurochemistry.get_mood_vector()
-        neurochemistry_prompt = self.neurochemistry.get_prompt_injection()
+        mood_vector = self.neurochemistry.get_mood_vector() if hasattr(self, 'neurochemistry') and self.neurochemistry else {}
+        neurochemistry_prompt = self.neurochemistry.get_prompt_injection() if hasattr(self, 'neurochemistry') and self.neurochemistry else ""
         
         # ═══════════════════════════════════════════════════════════
         # Step 1: Perception (Multimodal Context)
@@ -911,12 +916,13 @@ class ZaraConsciousness:
                 )
             
             # Add to dream processing queue
-            self.dreams.add_memory_for_processing(
-                content=f"User: {user_input[:100]} | ZARA: {full_response[:100]}",
-                emotional_weight=0.6 if detected_emotion != "neutral" else 0.4,
-                importance=0.7 if "?" in user_input else 0.5,
-                category=self._categorize_topic(user_input)
-            )
+            if hasattr(self, 'dreams') and self.dreams:
+                self.dreams.add_memory_for_processing(
+                    content=f"User: {user_input[:100]} | ZARA: {full_response[:100]}",
+                    emotional_weight=0.6 if detected_emotion != "neutral" else 0.4,
+                    importance=0.7 if "?" in user_input else 0.5,
+                    category=self._categorize_topic(user_input)
+                )
             
             # ═══════════════════════════════════════════════════════
             # Step 5: Handle Code Generation
@@ -965,9 +971,10 @@ class ZaraConsciousness:
                 return message
         
         # Check dreams for insights
-        thought = self.dreams.get_proactive_thought()
-        if thought:
-            return thought
+        if hasattr(self, 'dreams') and self.dreams:
+            thought = self.dreams.get_proactive_thought()
+            if thought:
+                return thought
         
         return None
 
